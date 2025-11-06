@@ -1,0 +1,121 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: "Inter";
+  src: url("/public/fonts/inter/Inter-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("/public/fonts/inter/Inter-Medium.woff2") format("woff2");
+  font-weight: 500;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Outfit";
+  src: url("/public/fonts/outfit/Outfit-Medium.woff2") format("woff2");
+  font-weight: 500;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Outfit";
+  src: url("/public/fonts/outfit/Outfit-SemiBold.woff2") format("woff2");
+  font-weight: 600;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Outfit";
+  src: url("/public/fonts/outfit/Outfit-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-display: swap;
+}
+
+@theme {
+  --clr-bg-primary:#ffffff;
+  --clr-bg-secondary: #f8f9fa;  
+  --clr-bg-inverse: #1a1d2e;
+
+  --clr-text-primary: #000000;  
+  --clr-text-secondary: #6c757d; 
+  --clr-text-inverse: #ffffff; 
+
+  --clr-border: #e9ecef;        
+
+  --clr-accent-primary: #ff6b9d; 
+  --clr-accent-secondary: #8d99ae;   
+
+  --ff-heading: "Outfit", sans-serif;
+  --ff-body: "Inter", sans-serif;
+
+  --ff-size-base: 0.75rem;
+  --line-height-base: 1.5;
+
+  --ff-size-h6: 0.9375rem;
+  --letter-spacing-h6: -0.005em;
+
+  --ff-size-h5: 1.1719rem;
+  --letter-spacing-h5: -0.005em;
+
+  --ff-size-h4: 1.4648rem;
+  --line-height-h4: 1.3;
+
+  --ff-size-h3: 1.831rem;
+  --letter-spacing-h3: -0.015em;
+
+  --ff-size-h2: 2.2888rem;
+  --line-height-h2: 1.1;
+
+  --ff-size-h1: 2.861rem;
+  --line-height-h1: 1;
+  --letter-spacing-h1: -0.02em;
+}
+
+@layer utilities {
+  .text-body {
+    font-family: var(--ff-body);
+    font-size: var(--ff-size-base);
+    line-height: var(--line-height-base);
+  }
+
+  .text-h6 {
+    font-family: var(--ff-heading);
+    font-size: var(--ff-size-h6);
+    letter-spacing: var(--letter-spacing-h6);
+  }
+
+  .text-h5 {
+    font-family: var(--ff-heading);
+    font-size: var(--ff-size-h5);
+    letter-spacing: var(--letter-spacing-h5);
+  }
+
+  .text-h4 {
+    font-family: var(--ff-heading);
+    font-size: var(--ff-size-h4);
+    line-height: var(--line-height-h4);
+  }
+
+  .text-h3 {
+    font-family: var(--ff-heading);
+    font-size: var(--ff-size-h3);
+    letter-spacing: var(--letter-spacing-h3);
+  }
+
+  .text-h2 {
+    font-family: var(--ff-heading);
+    font-size: var(--ff-size-h2);
+    line-height: var(--line-height-h2);
+  }
+
+  .text-h1 {
+    font-family: var(--ff-heading);
+    font-size: var(--ff-size-h1);
+    line-height: var(--line-height-h1);
+    letter-spacing: var(--letter-spacing-h1);
+  }
+}

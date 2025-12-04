@@ -15,22 +15,22 @@
 }
 
 @font-face {
-  font-family: "Outfit";
-  src: url("/fonts/outfit/Outfit-Medium.woff2") format("woff2");
+  font-family: "Plus Jakarta Sans";
+  src: url("/fonts/plus-jakarta-sans/PlusJakartaSans-Medium.woff2") format("woff2");
   font-weight: 500;
   font-display: swap;
 }
 
 @font-face {
-  font-family: "Outfit";
-  src: url("/fonts/outfit/Outfit-SemiBold.woff2") format("woff2");
+  font-family: "Plus Jakarta Sans";
+  src: url("/fonts/plus-jakarta-sans/PlusJakartaSans-SemiBold.woff2") format("woff2");
   font-weight: 600;
   font-display: swap;
 }
 
 @font-face {
-  font-family: "Outfit";
-  src: url("/fonts/outfit/Outfit-Bold.woff2") format("woff2");
+  font-family: "Plus Jakarta Sans";
+  src: url("/fonts/plus-jakarta-sans/PlusJakartaSans-Bold.woff2") format("woff2");
   font-weight: 700;
   font-display: swap;
 }
@@ -40,9 +40,11 @@
   --color-surface: #f8f9fa;  
   --color-inverse: #1a1d2e;
 
-  --color-text-default: #000000;  
-  --color-text-muted: #6c757d; 
-  --color-text-inverse: #ffffff; 
+  --color-text-100: #ffffff; 
+  --color-text-300: #adb5bd;   
+  --color-text-500: #6c757d;   
+  --color-text-700: #343a40;   
+  --color-text-900: #000000;
   
   --color-divider-100: #f8f9fa;
   --color-divider-200: #e9ecef;    
@@ -51,8 +53,9 @@
 
   --color-accent-primary: #ff6b9d; 
   --color-accent-secondary: #8d99ae;   
+  --color-accent-tertiary: oklch(85.2% 0.199 91.936);   
 
-  --font-heading: "Outfit", sans-serif;
+  --font-heading: "Plus Jakarta Sans", sans-serif;
   --font-body: "Inter", sans-serif;
 
   --font-scale-ratio: 1.25;
@@ -124,16 +127,16 @@
   }
 }
 
-@media (max-width: 40rem) {
+@media (max-width: 56rem) {
   :root {
-    --font-size-base: 0.875rem;
-    --font-scale-ratio: 1.15;
+    --font-size-base: 1rem;
+    --font-scale-ratio: 1.2;
   }
 }
 
-@media (max-width: 56rem) {
+@media (max-width: 40rem) {
   :root {
-    --font-size-base: 0.9375rem;
-    --font-scale-ratio: 1.2;
+    --font-size-base: 0.75rem;
+    --font-scale-ratio: 1.15;
   }
 }

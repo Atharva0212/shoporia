@@ -1,0 +1,1 @@
+export const Duration=2000;

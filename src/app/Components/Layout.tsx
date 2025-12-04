@@ -1,15 +1,30 @@
-import clsx from "clsx";
+import { twMerge } from "tailwind-merge";
 
 type LayoutProps = {
   children: React.ReactNode;
-  backgroundColor?: "background"|"surface"|"inverse";
+  backgroundColor?: "background" | "surface" | "inverse";
   className?: string;
+  isMain?:boolean;
 };
 
-export function Layout({ children, backgroundColor="surface",className }: LayoutProps) {
+export function Layout({
+  children,
+  backgroundColor = "surface",
+  className,
+  isMain=false,
+}: LayoutProps) {
+  const Tag = isMain ? "main" : "section";
   return (
-    <div className={clsx("max-w-7xl px-4 sm:px-0 mx-auto",`bg-${backgroundColor}`,className)}>
-      {children}
-    </div>
+    <Tag className={`bg-${backgroundColor}`}>
+      <div
+        className={twMerge(
+          "max-w-7xl p-4 mx-auto",
+          `bg-${backgroundColor}`,
+          className
+        )}
+      >
+        {children}
+      </div>
+    </Tag>
   );
 }

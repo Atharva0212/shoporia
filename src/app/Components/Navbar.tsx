@@ -3,16 +3,17 @@
 import Image from "next/image";
 import { Layout } from "./Layout";
 import { Button } from "./Button";
-import clsx from "clsx";
+import { twMerge } from "tailwind-merge";
+
 import { useState } from "react";
 
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   return (
     <>
-      <nav className="bg-background w-full p-2">
-        <div className="border-b border-divider-200 py-2">
-          <Layout className="flex items-center justify-between gap-1">
+      <nav>
+        <div className="border-b border-divider-200">
+          <Layout backgroundColor="background" className="flex items-center justify-between gap-1">
             <Logo />
             <SearchInput className="hidden sm:block flex-1" />
             <NavbarActions />
@@ -33,7 +34,7 @@ export function Navbar() {
 function Logo() {
   return (
     <div className="flex items-center gap-1.5">
-      <div className="bg-inverse text-text-inverse px-2  rounded-lg text-h4 md:text-h3">
+      <div className="bg-inverse text-text-100 px-2  rounded-lg text-h4 md:text-h3">
         S
       </div>
       <h2 className="text-h5 md:text-h3">Shoporia</h2>
@@ -43,13 +44,13 @@ function Logo() {
 
 function SearchInput({ className }: { className?: string }) {
   return (
-    <div className={clsx("relative max-w-xl w-full", className)}>
+    <div className={twMerge("relative max-w-xl w-full", className)}>
       <input
         type="text"
         placeholder="Search products, categories..."
         // value={searchQuery}
         // onChange={(e) => setSearchQuery(e.target.value)}
-        className="w-full pl-12 pr-4 py-2 text-text-muted border border-divider-300 rounded-full focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent text-body"
+        className="w-full pl-12 pr-4 py-2 text-text-500 border border-divider-300 rounded-full focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent text-body"
       />
       <div className="w-5 h-5 text-gray-400 absolute left-4 top-2.5">
         <Image src={"/icons/search.svg"} alt="Search" width={20} height={20} />
@@ -61,7 +62,7 @@ function SearchInput({ className }: { className?: string }) {
 function NavbarActions() {
   return (
     <div className="hidden sm:flex items-center gap-4">
-      <Button className="relative px-2 rounded-full before:content-['2'] before:absolute before:right-1 before:top-0 before:bg-inverse before:rounded-full before:font-body before:font-semibold before:text-text-inverse before:px-1 text-[12px]">
+      <Button className="relative px-2 rounded-full before:content-['2'] before:absolute before:right-1 before:top-0 before:bg-inverse before:rounded-full before:font-body before:font-semibold before:text-text-100 before:px-1 text-[12px]">
         <Image
           src={"/icons/shopping-cart.svg"}
           alt="shopping-cart"
@@ -78,7 +79,7 @@ function NavbarActions() {
           height={20}
           className="w-5 h-5"
         />
-        <span className="text-text-inverse">Login</span>
+        <span className="text-text-100">Login</span>
       </Button>
     </div>
   );
@@ -95,7 +96,7 @@ function NavbarMenuActions() {
           height={20}
           className="w-5 h-5"
         />
-        <span className="text-text-inverse">Login</span>
+        <span className="text-text-100">Login</span>
       </Button>
       <Button className="flex items-center justify-center border border-divider-400 gap-1 rounded-2xl">
         <Image

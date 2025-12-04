@@ -1,10 +1,14 @@
-import clsx from "clsx";
+import { twMerge } from "tailwind-merge";
 
-type ButtonProps = {
+type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   children: React.ReactNode;
   className?: string;
 };
 
-export function Button({ children, className }: ButtonProps) {
-  return <button className={clsx("py-2 px-4",className)}>{children}</button>;
+export function Button({ children, className, ...props }: ButtonProps) {
+  return (
+    <button className={twMerge("py-2 px-4 text-body", className)} {...props}>
+      {children}
+    </button>
+  );
 }

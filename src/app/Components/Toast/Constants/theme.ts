@@ -3,36 +3,39 @@ export const theme = {
     icon: {
       src: "/icons/alert/check.svg",
       alt: "Success",
-      bgColor: "#f0fdf4",
+      bgColor: "#cff9e1", // light mint, clearly visible, not bright
     },
-    borderColor: "#bbf7d0",
+    borderColor: "#86efac",
     progressColor: "#16a34a",
   },
+
   error: {
     icon: {
       src: "/icons/alert/alert.svg",
       alt: "Error",
-      bgColor: "#fef2f2",
+      bgColor: "#fbd4d4", // soft red, visible but not bright
     },
-    borderColor: "#fecaca",
+    borderColor: "#fca5a5",
     progressColor: "#dc2626",
   },
+
   info: {
     icon: {
       src: "/icons/alert/info.svg",
       alt: "Info",
-      bgColor: "#eff6ff",
+      bgColor: "#cddffe", // soft blue, light but readable
     },
-    borderColor: "#bfdbfe",
+    borderColor: "#93c5fd",
     progressColor: "#2563eb",
   },
+
   warning: {
     icon: {
       src: "/icons/alert/triangle-alert.svg",
       alt: "Warning",
-      bgColor: "#fefce8",
+      bgColor: "#fbedab", // soft yellow, mild but visible
     },
-    borderColor: "#fef08a",
+    borderColor: "#fde047",
     progressColor: "#ca8a04",
   },
 } as const;

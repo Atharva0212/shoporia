@@ -95,7 +95,7 @@ export function useToastController() {
 
     function addToast(content: React.ReactNode, newToastTheme: ToastVariant, options: Partial<ToastOptions> = {}) {
         const currentDate = getTimestamp();
-        const id = String(currentDate);
+        const id = crypto.randomUUID();
         const { animationVariant = "FADE", styles } = options;
         const mergedStyles = { ...styles }
         setToastList((prev) => [

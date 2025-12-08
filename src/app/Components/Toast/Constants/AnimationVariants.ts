@@ -4,7 +4,7 @@ export const AnimationVariants = {
     exit: "animate-fade-out",
   },
   SLIDE: {
-    enter: "animate-slide-up",
-    exit: "animate-slide-down",
+    enter: "animate-slide-in",
+    exit: "animate-slide-out",
   },
 } as const;

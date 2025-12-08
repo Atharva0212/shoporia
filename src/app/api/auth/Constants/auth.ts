@@ -1,0 +1,2 @@
+export const EMAIL_VERIFICATION_COOKIE = "VERIFY_EMAIL";
+export const AUTH_TOKEN_COOKIE = "AUTH_JWT";

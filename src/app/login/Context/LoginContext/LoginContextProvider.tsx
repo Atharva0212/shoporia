@@ -4,7 +4,7 @@ import { LoginContext } from "./LoginContext";
 
 export function LoginContextProvider({ children }: PropsWithChildren) {
   const [verificationStatus, setVerificationStatus] =
-    useState<VerificationStatus>("otpSent");
+    useState<VerificationStatus>("pending");
   const [email, setEmail] = useState("");
 
   function handleEmailChange(value: string) {

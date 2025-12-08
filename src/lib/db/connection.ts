@@ -61,7 +61,7 @@ async function getConnection(): Promise<mongoose.Connection> {
     return newConnection;
 }
 
-export async function getConnectionModel(collectionName: keyof DbModels): Promise<mongoose.Model<DbModels[keyof DbModels]["document"]>> {
+export async function getConnectionModel<K extends keyof DbModels>(collectionName: K): Promise<mongoose.Model<DbModels[K]["document"]>> {
     const store = ModelStore[collectionName];
     if (!store) {
         throw new Error(`No collection found for the:${collectionName}`)
@@ -69,6 +69,7 @@ export async function getConnectionModel(collectionName: keyof DbModels): Promis
     const connection = await getConnection();
 
     const { modelName, schema } = await store();
+    const model = connection.models[modelName] ?? connection.model(modelName, schema);
+    return model;
 
-    return connection.model(modelName, schema);
 }

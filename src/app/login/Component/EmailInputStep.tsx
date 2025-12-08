@@ -3,11 +3,16 @@ import Input from "../../Components/Input";
 import { useLoginContext } from "../Context/LoginContext/LoginContext";
 import { Button } from "../../Components/Button";
 import { useState } from "react";
+import axios from "axios";
+import { ExtendedMessageApiResponse } from "@/src/Types/response";
+import { useToast } from "../../Components/Toast/Context/ToastContext";
 
 export function EmailInputStep() {
-  const { email, handleEmailChange } = useLoginContext();
+  const { email, handleEmailChange,updateStatus } = useLoginContext();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [emailError, setEmailError] = useState("");
+
+  const {addToast}=useToast();
 
   const EmailIcon = (
     <Image
@@ -26,11 +31,17 @@ export function EmailInputStep() {
     }
     return true;
   }
-  function handleEmailSubmit() {
+  async function handleEmailSubmit() {
     const isEmailValid = validateEmail(email);
     if (!isEmailValid) return;
     try {
       setIsSubmitting(true);
+      const response=await axios.post<ExtendedMessageApiResponse>("api/auth/send-otp",{email});
+      const {data}=response;
+      if(data.success){
+        updateStatus("otpSent");
+        addToast(data.message,"info");
+      }
     } catch {
     } finally {
       setIsSubmitting(false);

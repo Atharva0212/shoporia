@@ -1,12 +1,21 @@
-import { useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { Button } from "../../Components/Button";
 import Image from "next/image";
+import axios from "axios";
+import { useToast } from "../../Components/Toast/Context/ToastContext";
+import { RedirectApiResponse } from "../../api/auth/verify-otp/types";
+import { useModal } from "../../Components/Modal/Context/ModalContext";
+import { getErrorMessage } from "@/src/utils/getErrorMessage";
 
 export function OTPInput({ length = 6 }: { length?: number }) {
-  const inputRef = useRef<HTMLInputElement[]>([]);
   const [otpArray, setOtpArray] = useState<string[]>(
     new Array(length).fill("")
   );
+
+  const inputRef = useRef<HTMLInputElement[]>([]);
+
+  const { addToast } = useToast();
+  const { setModal } = useModal();
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>, index: number) {
     const val = e.currentTarget.value.slice(-1);
@@ -71,9 +80,26 @@ export function OTPInput({ length = 6 }: { length?: number }) {
     inputRef.current[nextFocusedIndex]?.focus();
   }
 
-  function handleOtpSubmit(e:React.FormEvent){
+  async function handleOtpSubmit(e: React.FormEvent) {
     e.preventDefault();
-    // const  
+    const isAnyEmpty = otpArray.some((input) => !input);
+    if (isAnyEmpty) {
+      addToast("Please enter all 6 digits before continuing.", "warning");
+      return;
+    }
+    try {
+      const response = await axios.post<RedirectApiResponse>(
+        "/api/auth/verify-otp",
+        { otp: otpArray }
+      );
+      const { data } = response;
+      if (data.success) {
+        window.location.href = data.redirect;
+      }
+    } catch (error: unknown) {
+      const errorMessage = getErrorMessage(error, "Failed to verify OTP. Please try again.");
+      setModal(errorMessage, "error");
+    }
   }
 
   return (
@@ -81,7 +107,7 @@ export function OTPInput({ length = 6 }: { length?: number }) {
       <div className="p-2 flex items-center gap-2 justify-center mt-2">
         {otpArray.map((value, index) => {
           return (
-            <>
+            <React.Fragment key={index}>
               <label
                 htmlFor={`otp-input-${index + 1}`}
                 className="sr-only"
@@ -103,11 +129,14 @@ export function OTPInput({ length = 6 }: { length?: number }) {
                   fontFamily: "var(--font-body)",
                 }}
               />
-            </>
+            </React.Fragment>
           );
         })}
       </div>
-      <Button type="submit" className="w-full flex items-center justify-center gap-2 rounded-xl bg-inverse my-2">
+      <Button
+        type="submit"
+        className="w-full flex items-center justify-center gap-2 rounded-xl bg-inverse my-2"
+      >
         <Image
           src={"/icons/circle-check.svg"}
           alt=""

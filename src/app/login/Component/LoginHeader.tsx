@@ -24,8 +24,7 @@ export function LoginHeader() {
       <p className="text-body text-text-500 mb-4">
         {verificationStatus === "pending"
           ? "Sign in to access your account and continue shopping"
-          : verificationStatus === "otpSent"
-          // : verificationStatus === "otpSent" && email
+          : verificationStatus === "otpSent" && email
           ? `We've sent a verification code to ${email}`
           : null}
       </p>

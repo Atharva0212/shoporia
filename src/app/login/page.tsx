@@ -13,7 +13,7 @@ export default function Page() {
     <Layout
       isMain={true}
       backgroundColor="surface"
-      className="max-w-4xl flex items-center flex-col justify-center min-h-screen"
+      className="max-w-[424px] flex items-center flex-col justify-center min-h-screen"
     >
       <LoginContextProvider>
         <LoginFormSection />

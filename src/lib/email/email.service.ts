@@ -25,7 +25,6 @@ export class EmailService {
     }
 
     public async sendEmail(to: string, subject: string, html: string): Promise<{ success: true } | { success: false, error: "Failed to send email." }> {
-        return;
         try {
             await this.mailjet
                 .post('send', { version: 'v3.1' })

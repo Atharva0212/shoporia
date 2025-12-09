@@ -1,9 +1,8 @@
+import { getConnectionModel } from "@/src/lib/db/connection";
+import { verifyToken } from "@/src/utils/jwt";
 import { NextRequest, NextResponse } from "next/server";
 import { EMAIL_VERIFICATION_COOKIE } from "../Constants/auth";
-import { verifyToken } from "@/src/utils/jwt";
 import { TempUserTokenPayload } from "../types";
-import { getConnectionModel } from "@/src/lib/db/connection";
-import { compareOtp } from "./utils/compareOtp";
 import { RedirectApiResponse } from "./types";
 
 export async function POST(req: NextRequest): Promise<NextResponse<RedirectApiResponse>> {
@@ -24,6 +23,7 @@ export async function POST(req: NextRequest): Promise<NextResponse<RedirectApiRe
         const { tempUserId } = verifiedToken;
         
         const { otp } = await req.json();
+        
         if (!otp || String(otp).length !== 6) {
             return NextResponse.json<RedirectApiResponse>(
                 { success: false, error: "Invalid OTP." },
@@ -37,8 +37,10 @@ export async function POST(req: NextRequest): Promise<NextResponse<RedirectApiRe
                 { status: 404 }
             );
         }
+console.log(pendingUserRecord.otp);
+console.log(otp);
 
-        if (!compareOtp(pendingUserRecord.otp, otp)) {
+        if (pendingUserRecord.otp!==otp) {
             return NextResponse.json(
                 { success: false, error: "Incorrect OTP." },
                 { status: 401 }

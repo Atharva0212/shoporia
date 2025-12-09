@@ -6,6 +6,8 @@ import { useState } from "react";
 import axios from "axios";
 import { ExtendedMessageApiResponse } from "@/src/Types/response";
 import { useToast } from "../../Components/Toast/Context/ToastContext";
+import { getErrorMessage } from "@/src/utils/getErrorMessage";
+import { useModal } from "../../Components/Modal/Context/ModalContext";
 
 export function EmailInputStep() {
   const { email, handleEmailChange,updateStatus } = useLoginContext();
@@ -13,6 +15,7 @@ export function EmailInputStep() {
   const [emailError, setEmailError] = useState("");
 
   const {addToast}=useToast();
+  const {setModal}=useModal();
 
   const EmailIcon = (
     <Image
@@ -31,7 +34,8 @@ export function EmailInputStep() {
     }
     return true;
   }
-  async function handleEmailSubmit() {
+  async function handleEmailSubmit(e:React.FormEvent) {
+    e.preventDefault();
     const isEmailValid = validateEmail(email);
     if (!isEmailValid) return;
     try {
@@ -42,7 +46,9 @@ export function EmailInputStep() {
         updateStatus("otpSent");
         addToast(data.message,"info");
       }
-    } catch {
+    } catch (error){
+      const errorMessage=getErrorMessage(error,"Failed to send otp")
+      setModal(errorMessage,"error");
     } finally {
       setIsSubmitting(false);
     }

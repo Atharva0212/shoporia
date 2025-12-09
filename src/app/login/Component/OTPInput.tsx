@@ -87,10 +87,11 @@ export function OTPInput({ length = 6 }: { length?: number }) {
       addToast("Please enter all 6 digits before continuing.", "warning");
       return;
     }
+
     try {
       const response = await axios.post<RedirectApiResponse>(
         "/api/auth/verify-otp",
-        { otp: otpArray }
+        { otp: otpArray.join("")}
       );
       const { data } = response;
       if (data.success) {

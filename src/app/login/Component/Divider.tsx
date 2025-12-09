@@ -1,6 +1,6 @@
 export function Divider() {
   return (
-    <div className="flex items-center gap-4 my-6">
+    <div className="flex items-center gap-4 my-6 w-full">
       <DividerLine />
       <div>OR</div>
       <DividerLine />

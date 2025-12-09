@@ -2,7 +2,7 @@ import { getConnectionModel } from "@/src/lib/db/connection";
 import { ExtendedMessageApiResponse } from "@/src/Types/response";
 import { parseMongooseValidationError } from "@/src/utils/parseValidationError";
 import mongoose from "mongoose";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { generateOTP } from "./utils/generateOTP";
 import { createToken } from "@/src/utils/jwt";
 import { TempUserTokenPayload } from "../types";
@@ -11,7 +11,7 @@ import { EMAIL_VERIFICATION_COOKIE } from "../Constants/auth";
 import { EmailService } from "@/src/lib/email/email.service";
 import { generateVerificationEmail } from "./utils/verificationEmail";
 
-export async function POST(req: NextResponse): Promise<NextResponse<ExtendedMessageApiResponse>> {
+export async function POST(req: NextRequest): Promise<NextResponse<ExtendedMessageApiResponse>> {
     try {
         const { email } = await req.json();
 
@@ -19,7 +19,7 @@ export async function POST(req: NextResponse): Promise<NextResponse<ExtendedMess
 
         const exisistingUser = await User.findOne({ email });
         if (exisistingUser) {
-            return NextResponse.json<ExtendedMessageApiResponse>({ success: true, message: "User already exsists" }, { status: 409 });
+            return NextResponse.json<ExtendedMessageApiResponse>({ success: false, error: "User already exsists" }, { status: 409 });
         }
         const PendingUser = await getConnectionModel("PendingUser");
         const otp = generateOTP();
@@ -31,7 +31,6 @@ export async function POST(req: NextResponse): Promise<NextResponse<ExtendedMess
         const payload = { tempUserId: savedPendingUser._id.toString() };
 
         const token = createToken<TempUserTokenPayload>(payload);
-console.log(token);
 
         const cookieOptions: CookieOptions = {
             maxAge: 300,// 5 mins

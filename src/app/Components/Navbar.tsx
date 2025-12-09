@@ -1,11 +1,11 @@
 "use client";
 
 import Image from "next/image";
-import { Layout } from "./Layout";
-import { Button } from "./Button";
 import { twMerge } from "tailwind-merge";
-
+import { Button } from "./Button";
+import { Layout } from "./Layout";
 import { useState } from "react";
+import Link from "next/link";
 
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -13,17 +13,27 @@ export function Navbar() {
     <>
       <nav>
         <div className="border-b border-divider-200">
-          <Layout backgroundColor="background" className="flex items-center justify-between gap-1">
+          <Layout
+            backgroundColor="background"
+            className="flex items-center justify-between gap-1"
+          >
             <Logo />
             <SearchInput className="hidden sm:block flex-1" />
             <NavbarActions />
-            <HamburgerMenu isMenuOpen={isMenuOpen} onMenuToogle={()=>setIsMenuOpen(prev=>!prev)}/>
+            <HamburgerMenu
+              isMenuOpen={isMenuOpen}
+              onMenuToogle={() => setIsMenuOpen((prev) => !prev)}
+            />
           </Layout>
         </div>
-        <div className={`sm:hidden border-b border-divider-300 ${isMenuOpen?"block":"hidden"}`}>
+        <div
+          className={`sm:hidden border-b border-divider-300 ${
+            isMenuOpen ? "block" : "hidden"
+          }`}
+        >
           <Layout className="py-4">
             <SearchInput className="mx-auto mb-4" />
-            <NavbarMenuActions/>
+            <NavbarMenuActions />
           </Layout>
         </div>
       </nav>
@@ -71,33 +81,33 @@ function NavbarActions() {
           className="w-[26px] h-[26px]"
         />
       </Button>
-      <Button className="flex items-center gap-1 bg-inverse rounded-full">
-        <Image
-          src={"/icons/user.svg"}
-          alt=""
-          width={20}
-          height={20}
-          className="w-5 h-5"
-        />
-        <span className="text-text-100">Login</span>
-      </Button>
+      <LoginButton />
     </div>
+  );
+}
+
+function LoginButton() {
+  return (
+    <Link
+      className="flex items-center justify-center gap-1 bg-inverse rounded-2xl py-2 px-4 text-body"
+      href={"/login"}
+    >
+      <Image
+        src={"/icons/user.svg"}
+        alt=""
+        width={20}
+        height={20}
+        className="w-5 h-5"
+      />
+      <span className="text-text-100">Login</span>
+    </Link>
   );
 }
 
 function NavbarMenuActions() {
   return (
     <div className="grid grid-cols-2 items-center gap-4">
-      <Button className="flex items-center justify-center gap-1 bg-inverse rounded-2xl">
-        <Image
-          src={"/icons/user.svg"}
-          alt=""
-          width={20}
-          height={20}
-          className="w-5 h-5"
-        />
-        <span className="text-text-100">Login</span>
-      </Button>
+      <LoginButton />
       <Button className="flex items-center justify-center border border-divider-400 gap-1 rounded-2xl">
         <Image
           src={"/icons/shopping-cart.svg"}
@@ -112,12 +122,12 @@ function NavbarMenuActions() {
   );
 }
 
-type HamburgerMenuProps={
-  isMenuOpen:boolean,
-onMenuToogle:()=>void,
-}
+type HamburgerMenuProps = {
+  isMenuOpen: boolean;
+  onMenuToogle: () => void;
+};
 
-function HamburgerMenu({isMenuOpen,onMenuToogle}:HamburgerMenuProps) {
+function HamburgerMenu({ isMenuOpen, onMenuToogle }: HamburgerMenuProps) {
   return (
     <button
       onClick={onMenuToogle}

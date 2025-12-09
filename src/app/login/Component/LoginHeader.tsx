@@ -21,7 +21,7 @@ export function LoginHeader() {
           ? "Verify Your Email"
           : null}
       </h1>
-      <p className="text-body text-text-500 mb-4">
+      <p className="text-body text-center text-text-500 mb-4">
         {verificationStatus === "pending"
           ? "Sign in to access your account and continue shopping"
           : verificationStatus === "otpSent" && email

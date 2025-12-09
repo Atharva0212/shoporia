@@ -2,6 +2,7 @@ import { CategorySection } from "./Components/CategorySection";
 import { FeaturedProducts } from "./Components/FeaturedProducts";
 import { HeroSection } from "./Components/HeroSection";
 import { Navbar } from "./Components/Navbar";
+import { PopupModal } from "./Components/PopupModal";
 import { homeCarouselSlides } from "./Constants/home-carousel";
 
 export default function Page() {
@@ -12,6 +13,7 @@ export default function Page() {
           <HeroSection slideData={homeCarouselSlides}/>
           <CategorySection />
           <FeaturedProducts/>
+          <PopupModal/>
       </main>
     </>
   );

@@ -1,14 +1,16 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useEffectEvent } from "react";
 import { useModal } from "./Modal/Context/ModalContext"
 
 export function PopupModal() {
     const {setModal}=useModal();
+
+    const showDevNotice=useEffectEvent(()=>{
+      setModal("This site is currently under active development. Some features may not work as expected.","info")
+    })
     useEffect(()=>{
-        setModal("This site is currently under active development. Some features may not work as expected.","info")
-    },[setModal])
-  return (
-    <div>PopupModal</div>
-  )
+      showDevNotice();
+    },[])
+  return null;
 }

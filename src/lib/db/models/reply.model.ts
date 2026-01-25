@@ -7,6 +7,7 @@ type ReplyRecordData = {
     review: MongooseObjectId;
     user: MongooseObjectId;
     comment: string;
+    createdAt:Date;
 }
 
 export type ReplyDocument = BaseDocument<ReplyRecordData>;
@@ -16,10 +17,8 @@ export const ReplySchema = new Schema<ReplyDocument>(
         review: { type: Schema.Types.ObjectId, ref: reviewModelName, required: true },
         user: { type: Schema.Types.ObjectId, ref: userModelName, required: true },
         comment: { type: String, required: true },
+        createdAt: { type: Date, default:Date.now },
     },
-    {
-        timestamps: true
-    }
 );
 
 export const replyModelName = "Reply";

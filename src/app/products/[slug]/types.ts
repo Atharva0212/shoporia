@@ -1,6 +1,7 @@
 import { ProductRecordData } from "@/src/lib/db/models/product.model";
 import { ImageRecordData } from "@/src/lib/db/models/products/ProductImage.model";
 import { VariantRecordData } from "@/src/lib/db/models/products/ProductVariant.model";
+import { MongooseObjectId } from "@/src/lib/db/types";
 
 export type PaginatedCursor = {
     hasMore: true, cursor: {
@@ -16,6 +17,8 @@ export type PaginatedResult<T extends object> = {
 
 type FetchablePaginatedResult<T extends object> = { hasFetched: false, data: T[] } | { hasFetched: true } & PaginatedResult<T>;
 
+export type RawReview=Omit<Review,"reviewId"|"replies"|"user"|"hasReplies">&{_id:MongooseObjectId,user:Omit<Review["user"],"id">&{_id:MongooseObjectId},replyCount:number}
+
 export type Review = {
     reviewId: string;
     user: {
@@ -26,7 +29,7 @@ export type Review = {
     rating: number;
     comment: string;
     createdAt: Date;
-    repliesCount: number;
+    hasReplies: boolean;
     replies: FetchablePaginatedResult<Reply>;
 };
 
@@ -40,6 +43,8 @@ export type Reply = {
     comment: string;
     createdAt: Date;
 };
+
+export type RawReply=Omit<Reply,"id">&{_id:MongooseObjectId};
 
 export type ProductDetails = {
     id: string,

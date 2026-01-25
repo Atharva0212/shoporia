@@ -6,9 +6,7 @@ import { ImageDocument, ImageSchema } from "./products/ProductImage.model";
 import { ProductReviewRecordData, ReviewSchema } from "./products/ProductReview.model";
 import { VariantRecordData, VariantSchema } from "./products/ProductVariant.model";
 
-type RatingValue = 1 | 2 | 3 | 4 | 5;
-
-type RatingDistribution = Record<RatingValue, number>;
+type RatingDistribution = Record<number, number>;
 
 type RatingDistributionData = { distribution: RatingDistribution }
 

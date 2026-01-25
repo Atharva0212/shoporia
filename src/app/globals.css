@@ -16,44 +16,51 @@
 
 @font-face {
   font-family: "Plus Jakarta Sans";
-  src: url("/fonts/plus-jakarta-sans/PlusJakartaSans-Medium.woff2") format("woff2");
+  src: url("/fonts/plus-jakarta-sans/PlusJakartaSans-Medium.woff2")
+    format("woff2");
   font-weight: 500;
   font-display: swap;
 }
 
 @font-face {
   font-family: "Plus Jakarta Sans";
-  src: url("/fonts/plus-jakarta-sans/PlusJakartaSans-SemiBold.woff2") format("woff2");
+  src: url("/fonts/plus-jakarta-sans/PlusJakartaSans-SemiBold.woff2")
+    format("woff2");
   font-weight: 600;
   font-display: swap;
 }
 
 @font-face {
   font-family: "Plus Jakarta Sans";
-  src: url("/fonts/plus-jakarta-sans/PlusJakartaSans-Bold.woff2") format("woff2");
+  src: url("/fonts/plus-jakarta-sans/PlusJakartaSans-Bold.woff2")
+    format("woff2");
   font-weight: 700;
   font-display: swap;
 }
 
 @theme {
-  --color-background:#ffffff;
-  --color-surface: #f8f9fa;  
+  --color-background: #ffffff;
+  --color-surface-subtle: #f8f9fa;
+  --color-surface: #f8f9fa;
   --color-inverse: #1a1d2e;
 
-  --color-text-100: #ffffff; 
-  --color-text-300: #adb5bd;   
-  --color-text-500: #6c757d;   
-  --color-text-700: #343a40;   
-  --color-text-900: #000000;
-  
-  --color-divider-100: #f8f9fa;
-  --color-divider-200: #e9ecef;    
-  --color-divider-300: #dee2e6;   
-  --color-divider-400: #ced4da;
+  --color-skeleton: #e5e7eb;
 
-  --color-accent-primary: #ff6b9d; 
-  --color-accent-secondary: #8d99ae;   
-  --color-accent-tertiary: oklch(85.2% 0.199 91.936);   
+  --color-text-100: #ffffff;
+  --color-text-300: #adb5bd;
+  --color-text-500: #6c757d;
+  --color-text-700: #343a40;
+  --color-text-900: #000000;
+
+  --color-divider-100: #f8f9fa;
+  --color-divider-200: #e9ecef;
+  --color-divider-300: #dee2e6;
+  --color-divider-400: #ced4da;
+  --color-divider-900: #1a1d2e;
+
+  --color-accent-primary: #ff6b9d;
+  --color-accent-secondary: #8d99ae;
+  --color-accent-tertiary: oklch(85.2% 0.199 91.936);
 
   --font-heading: "Plus Jakarta Sans", sans-serif;
   --font-body: "Inter", sans-serif;
@@ -61,6 +68,8 @@
   --font-scale-ratio: 1.25;
   --font-size-base: 1.03125rem;
   --line-height-base: 1.5;
+
+  --optical-adjust-xs: 0.854;
 
   --font-size-h6: calc(var(--font-size-base) * var(--font-scale-ratio));
   --letter-spacing-h6: -0.005em;
@@ -83,6 +92,16 @@
 }
 
 @layer utilities {
+  .text-body-xs {
+    font-family: var(--font-body);
+    font-size: calc((var(--font-size-base) * var(--optical-adjust-xs)));
+  }
+
+  .text-body-sm {
+    font-family: var(--font-body);
+    font-size: calc((var(--font-size-base) * 0.9));
+  }
+
   .text-body {
     font-family: var(--font-body);
     font-size: var(--font-size-base);
@@ -136,7 +155,8 @@
 
 @media (max-width: 40rem) {
   :root {
-    --font-size-base: 0.75rem;
+    --font-size-base: 0.95rem;
     --font-scale-ratio: 1.15;
+    --optical-adjust-xs: 0.7899;
   }
 }

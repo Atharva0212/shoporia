@@ -15,12 +15,6 @@ export async function POST(req: NextRequest): Promise<NextResponse<ExtendedMessa
     try {
         const { email } = await req.json();
 
-        const User = await getConnectionModel("User");
-
-        const exisistingUser = await User.findOne({ email });
-        if (exisistingUser) {
-            return NextResponse.json<ExtendedMessageApiResponse>({ success: false, error: "User already exsists" }, { status: 409 });
-        }
         const PendingUser = await getConnectionModel("PendingUser");
         const otp = generateOTP();
         const pendingUser = new PendingUser({

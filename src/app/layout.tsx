@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { ModalProvider } from "./Components/Modal/Context/ModalProvider";
 import { ToastProvider } from "./Components/Toast/Context/ToastProvider";
+import { ReduxProvider } from "./Components/ReduxProvider";
 
 export const metadata: Metadata = {
   title: "Discover Premium Products Across Fashion, Tech & Lifestyle",
@@ -17,9 +18,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`antialiased font-body`}>
-        <ToastProvider>
-          <ModalProvider>{children}</ModalProvider>
-        </ToastProvider>
+        <ReduxProvider>
+          <ToastProvider>
+            <ModalProvider>{children}</ModalProvider>
+          </ToastProvider>
+        </ReduxProvider>
       </body>
     </html>
   );

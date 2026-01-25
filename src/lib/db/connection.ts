@@ -45,7 +45,6 @@ async function getConnection(): Promise<mongoose.Connection> {
     const newConnection = await ensureConnectionPromise();
 
     newConnection.on('disconnected', () => {
-        console.warn(`Database disconnected!`);
         global.dbCache.cachedConnection = null;
     });
 
@@ -71,5 +70,4 @@ export async function getConnectionModel<K extends keyof DbModels>(collectionNam
     const { modelName, schema } = await store();
     const model = connection.models[modelName] ?? connection.model(modelName, schema);
     return model;
-
 }

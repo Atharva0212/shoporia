@@ -27,3 +27,7 @@ export type UserJwtPayload = { userId: string }
 export function decodeUserToken(token: string) {
     return verifyToken<UserJwtPayload>(token)
 }
+
+export function verifyUserToken(token:string){
+    return verifyToken<UserJwtPayload>(token);
+}

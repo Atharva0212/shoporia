@@ -1,11 +1,14 @@
-import React, { useRef, useState } from "react";
-import { Button } from "../../Components/Button";
-import Image from "next/image";
-import axios from "axios";
-import { useToast } from "../../Components/Toast/Context/ToastContext";
-import { RedirectApiResponse } from "../../api/auth/verify-otp/types";
-import { useModal } from "../../Components/Modal/Context/ModalContext";
 import { getErrorMessage } from "@/src/utils/getErrorMessage";
+import axios from "axios";
+import Image from "next/image";
+import { useRouter } from "next/router";
+import React, { useRef, useState } from "react";
+import { LoginApiResponse } from "../../api/auth/verify-otp/types";
+import { Button } from "../../Components/Button";
+import { useModal } from "../../Components/Modal/Context/ModalContext";
+import { useToast } from "../../Components/Toast/Context/ToastContext";
+import { updateLoginStatus } from "../../features/user/userSlice";
+import { useAppDispatch } from "../../store/hooks";
 
 export function OTPInput({ length = 6 }: { length?: number }) {
   const [otpArray, setOtpArray] = useState<string[]>(
@@ -16,6 +19,9 @@ export function OTPInput({ length = 6 }: { length?: number }) {
 
   const { addToast } = useToast();
   const { setModal } = useModal();
+
+  const dispatch=useAppDispatch();
+  const router=useRouter();
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>, index: number) {
     const val = e.currentTarget.value.slice(-1);
@@ -89,13 +95,15 @@ export function OTPInput({ length = 6 }: { length?: number }) {
     }
 
     try {
-      const response = await axios.post<RedirectApiResponse>(
+      const response = await axios.post<LoginApiResponse>(
         "/api/auth/verify-otp",
         { otp: otpArray.join("")}
       );
       const { data } = response;
-      if (data.success) {
-        window.location.href = data.redirect;
+      if(data.success){
+        const {avatar,userName}=data.userState;
+        dispatch(updateLoginStatus({isLoggedIn:true,avatar,name:userName}));
+        router.back();
       }
     } catch (error: unknown) {
       const errorMessage = getErrorMessage(error, "Failed to verify OTP. Please try again.");

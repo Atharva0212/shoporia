@@ -1,6 +1,6 @@
 import { PaginatedReview, RawReview } from "@/src/app/products/[slug]/types";
 import { getConnectionModel } from "@/src/lib/db/connection";
-import { DataApiResponse, MessageApiResponse } from "@/src/Types/response";
+import { DataApiResponse } from "@/src/Types/response";
 import { toMongoObjectId } from "@/src/utils/objectId";
 import { NextRequest, NextResponse } from "next/server";
 import { AUTH_TOKEN_COOKIE } from "../../../auth/Constants/auth";
@@ -19,7 +19,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ slug
         }
         const url = new URL(req.url);
         const createdAtStr = url.searchParams.get("createdAt");
-        const createdAt = createdAtStr ? new Date(createdAtStr) : new Date();
+        const createdAt = createdAtStr ? new Date(Number(createdAtStr)) : new Date();
+        
         const id = url.searchParams.get("id");
         const paginatedReviews = await fetchPaginatedReviews({ productId, createdAt, id });
         return NextResponse.json({ success: true, responseData: paginatedReviews }, { status: 200 });
@@ -61,9 +62,7 @@ async function fetchPaginatedReviews({ productId, createdAt, id }: { productId: 
                 user: {
                     _id: 1,
                     name: 1,
-                    avatar: {
-                        bgColor: 1,
-                    },
+                    avatarBg:1,
                 },
                 rating: 1,
                 comment: 1,
@@ -108,14 +107,21 @@ function buildPaginatedReviews({ aggregatedReviews, REVIEWS_PAGE_SIZE }: { aggre
         paginationState: {
             cursor: {
                 createdAt: lastReview.createdAt,
-                lastId: lastReview.reviewId,
+                id: lastReview.reviewId,
             },
             hasMore: reviews.length === REVIEWS_PAGE_SIZE,
         }
     }
 }
 
-export async function POST(req: NextRequest, { params }: { params: Promise<{ slug: string }> }): Promise<NextResponse<MessageApiResponse>> {
+type CreateReviewResponse = {
+    reviewId: string,
+    averageRating: number,
+}
+
+export type CreateReviewApiResponse = DataApiResponse<CreateReviewResponse>;
+
+export async function POST(req: NextRequest, { params }: { params: Promise<{ slug: string }> }): Promise<NextResponse<CreateReviewApiResponse>> {
     try {
         const token = req.cookies.get(AUTH_TOKEN_COOKIE)?.value;
         if (!token) {
@@ -132,7 +138,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ slu
 
         const productObjectId = toMongoObjectId(productId);
         const userObjectId = toMongoObjectId(userId);
-
+        
         const existingReview = await Review.findOne({ product: productObjectId, user: userObjectId });
         if (existingReview) {
             return NextResponse.json(
@@ -166,21 +172,23 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ slu
         const updatedReviewCount = productRecord.reviewCount + 1;
 
         const updatedAverageRating = calculateUpdatedAverageRating({ ratingDistribution: updatedRatingDistribution, totalRatingsCount: updatedReviewCount });
-
+        
         await Product.findByIdAndUpdate(productId, {
-            ratingDistribution: { distribution: updatedRatingDistribution },
-            reviewCount: updatedReviewCount,
-            averageRating: updatedAverageRating,
+            $set: {
+                ratingDistribution: { distribution: updatedRatingDistribution },
+                reviewCount: updatedReviewCount,
+                averageRating: updatedAverageRating,
+            },
             $push: {
                 reviews: {
-                    $each: [{ review: newReview._id, createdAt: Date.now() }],
+                    $each: [{ review: newReview._id, createdAt: new Date() }],
                     $sort: { createdAt: -1 },
                     $slice: 5,
                 },
             },
-        });
+        },{ new: true });
 
-        return NextResponse.json({ success: true, message: "Review added successfully" }, { status: 201 });
+        return NextResponse.json({ success: true, responseData: { reviewId: newReview._id.toString(), averageRating: updatedAverageRating } }, { status: 201 });
     } catch (error) {
         console.error("Error inserting review:", error);
         return NextResponse.json({ success: false, error: "Internal server error" }, { status: 500 });

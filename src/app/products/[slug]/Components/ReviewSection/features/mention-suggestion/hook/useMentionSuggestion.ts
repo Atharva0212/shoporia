@@ -19,10 +19,16 @@ type ActiveMentionSuggestion = {
 
 type MentionPostion = | "top" | "bottom";
 
+function dedupeMentions(mentionItems:MentionItem[]):MentionItem[]{
+    console.log(mentionItems);
+    
+    const map=new Map([...mentionItems.map(item=>[item.id,item] as const)])
+    return Array.from(map.values());
+}
+
 export type MentionSuggestionState =
     | { showList: false }
     | ({ showList: true } & ActiveMentionSuggestion);
-
 
 export function useMentionSuggestion({ query, setQueryValue, inputRef }: UseMentionSuggestionOptions) {
     const [mentionSuggestion, setMentionSuggestion] =
@@ -48,12 +54,25 @@ export function useMentionSuggestion({ query, setQueryValue, inputRef }: UseMent
                 item.name.toLowerCase().includes(query.toLowerCase())
             );
 
-            return matches;
+            return dedupeMentions(matches);
         },
         [mentionItems]
     );
 
-    function handleQueryChange(e: ChangeEvent<HTMLInputElement>) {
+    const getDropdownPosition = useCallback((): { success: true, mentionPosition: MentionPostion, styling: React.CSSProperties } | { success: false } => {
+        if (!inputRef.current) return { success: false };
+        const screenHeight = window.innerHeight;
+        const { top: spaceAbove, bottom } = inputRef.current.getBoundingClientRect();
+        const spaceBelow = screenHeight - bottom;
+        const openUp = spaceAbove > spaceBelow;
+        const dropdownPlacement = openUp
+            ? { mentionPosition: "top" as const, styling: { bottom: "100%", marginBlockStart: "6px" } }
+            : { mentionPosition: "bottom" as const, styling: { top: "100%", marginBlockEnd: "6px" } };
+
+        return { success: true, ...dropdownPlacement };
+    }, [inputRef])
+
+    const handleQueryChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
         const inputValue = e.target.value;
         setQueryValue(inputValue);
         const cursorPosition = e.target.selectionStart ?? 0;
@@ -98,9 +117,9 @@ export function useMentionSuggestion({ query, setQueryValue, inputRef }: UseMent
                 ...(dropdownPositionResult.success ? { styles: dropdownPositionResult.styling } : {})
             });
         }
-    }
+    }, [computeFilteredItems, getDropdownPosition, mentionSuggestion, setQueryValue])
 
-    function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
         const keyboardEvents: Record<typeof e.key, () => void> = {
             ArrowUp: () => {
                 e.preventDefault();
@@ -151,20 +170,7 @@ export function useMentionSuggestion({ query, setQueryValue, inputRef }: UseMent
         } as const;
         const handler = keyboardEvents[e.key as keyof typeof keyboardEvents];
         handler?.();
-    }
-
-    function getDropdownPosition(): { success: true, mentionPosition: MentionPostion, styling: React.CSSProperties } | { success: false } {
-        if (!inputRef.current) return { success: false };
-        const screenHeight = window.innerHeight;
-        const { top: spaceAbove, bottom } = inputRef.current.getBoundingClientRect();
-        const spaceBelow = screenHeight - bottom;
-        const openUp = spaceAbove > spaceBelow;
-        const dropdownPlacement = openUp
-            ? { mentionPosition: "top" as const, styling: { bottom: "100%", marginBlockStart: "6px" } }
-            : { mentionPosition: "bottom" as const, styling: { top: "100%", marginBlockEnd: "6px" } };
-
-        return { success: true, ...dropdownPlacement };
-    }
+    }, [mentionSuggestion, query, setQueryValue])
 
     function closeMentionList() {
         setMentionSuggestion({ showList: false });

@@ -6,6 +6,7 @@ import { useModalController } from "../hooks/useModalController";
 type ModalContextType = {
     setModal: ReturnType<typeof useModalController>["setModal"];
     openModal: ReturnType<typeof useModalController>["openModal"];
+    closeModal: ReturnType<typeof useModalController>["closeModal"]
 }
 
 export const ModalContext = createContext<ModalContextType | null>(null);

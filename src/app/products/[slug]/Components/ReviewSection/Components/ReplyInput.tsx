@@ -1,10 +1,10 @@
-import { Review } from "../../../types";
+import { ProductDetailsClient, Review } from "../../../types";
 import type { useMentionSuggestion } from "../features/mention-suggestion/hook/useMentionSuggestion";
 import { MentionSuggestion } from "../features/mention-suggestion/MentionSuggestion";
 
 type ReplyInputProps = {
   handleReplyReset: () => void;
-  handleReplySubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+  handleReplySubmit: (e: React.FormEvent<HTMLFormElement>,reviewId:ProductDetailsClient["reviews"]["reviewData"]["data"][number]["reviewId"]) => void;
   inputRef: React.RefObject<HTMLInputElement | null>;
   handleQueryChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   query: string;
@@ -31,7 +31,7 @@ export function ReplyInput({
     <div className="px-6 pb-6 pt-2 bg-gray-50 border-t border-gray-200">
       <form
         onReset={handleReplyReset}
-        onSubmit={handleReplySubmit}
+        onSubmit={(e)=>handleReplySubmit(e,reviewId)}
         className="space-y-3"
       >
         <div className="relative">

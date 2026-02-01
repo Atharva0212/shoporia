@@ -19,7 +19,6 @@ export function MentionSuggestion({
   ) {
     return null;
   }
-  console.log(mentionSuggestion);
   
   return (
     <ul

@@ -1,6 +1,6 @@
 "use client";
 
-import { PropsWithChildren } from "react";
+import React, { PropsWithChildren } from "react";
 import { ToastContext } from "./ToastContext";
 import { useToastController } from "../hooks/useToastController";
 import { ToastContainer } from "../ToastContainer";

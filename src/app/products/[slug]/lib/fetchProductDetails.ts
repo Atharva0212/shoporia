@@ -1,24 +1,26 @@
 import { getConnectionModel } from "@/src/lib/db/connection";
 import { ProductDocument, ProductRecordData } from "@/src/lib/db/models/product.model";
 import { PaginatedCursor, ProductDetails } from "../types";
+import { UserDocument } from "@/src/lib/db/models/user.model";
 
 export async function fetchProductDetails({ slug, userId }: { slug: ProductRecordData["slug"], userId: string | undefined }): Promise<{ success: true, data: ProductDetails } | { success: false, error: string, status: 404 | 500 }> {
     try {
         let canReviewProduct = false;
         await getConnectionModel("User");
         const Review = await getConnectionModel("Review");
+        
         const Product = await getConnectionModel("Product");
         const productRecord = await Product.findOne<ProductDocument>({ slug }).populate({
             path: "reviews.review",
             populate: {
                 path: "user",
-                select: "name avatar _id"
+                select: "name avatarBg _id"
             }
         }).lean();
 
         if (!productRecord) return { success: false, error: "The product that you are looking for doesnt exsists", status: 404 };
         if (userId) {
-            const existingReview = await Review.findOne({ productId: productRecord._id, userId })
+            const existingReview = await Review.findOne({ product: productRecord._id, user:userId })
             if (!existingReview) canReviewProduct = true
         }
 
@@ -61,32 +63,33 @@ function buildImageData({ images }: { images: ProductRecordData["images"] }): Pr
     }))
 }
 
-function buildReviewData({ reviews, reviewCount }: { reviews: ProductDocument["reviews"], reviewCount: ProductDocument["reviewCount"] }): ProductDetails["reviewData"] {
+function buildReviewData({ reviews, reviewCount }: { reviews: ProductDocument["reviews"], reviewCount: ProductDocument["reviewCount"] }): ProductDetails["reviewData"] {    
     const sortedReviews = [...reviews].sort(
-        (a, b) => a.review.createdAt.getTime() - b.review.createdAt.getTime()
+        (a, b) => b.review.createdAt.getTime() - a.review.createdAt.getTime()
     )
-    console.log(sortedReviews);
+
     const lastReview = sortedReviews[sortedReviews.length - 1].review;
 
-    const paginationState: PaginatedCursor = reviewCount > 5 ? { hasMore: true, cursor: { createdAt: lastReview.createdAt, lastId: lastReview._id.toString() } } : { hasMore: false };
+    const paginationState: PaginatedCursor = reviewCount > 5 ? { hasMore: true, cursor: { createdAt: lastReview.createdAt.getTime(), id: lastReview._id.toString() } } : { hasMore: false };
     return {
-        data: reviews.map(review => {
-            const { _id, rating, user, comment, createdAt, replyCount } = review.review;
-
+        data: reviews.map(reviewDoc => {
+            const { _id, rating, user, comment, createdAt, replyCount } = reviewDoc.review;
+            
+            const { avatarBg, name } = user as UserDocument;
             return {
                 reviewId: _id.toString(),
                 rating,
                 user: {
                     id: user._id.toString(),
-                    avatarBg: user.avatar.bg,
-                    name: user.name,
+                    avatarBg,
+                    name: name,
                 },
                 comment,
-                createdAt,
-                repliesCount: replyCount,
+                createdAt:createdAt.getTime(),
+                hasReplies: replyCount > 0,
                 replies: {
                     data: [],
-                    hasFetched: false
+                    hasFetched: false as const
                 },
             }
 

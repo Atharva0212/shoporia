@@ -1,10 +1,11 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import { UserAvatar } from "../../api/auth/verify-otp/types";
 
 export type UserState = {
     isLoggedIn: boolean,
-    name?: string
-} & Partial<UserAvatar>
+    userId?:string,
+    name?: string,
+    avatarBg?:string,
+};
 
 export const initialUserState: UserState = {
     isLoggedIn: false

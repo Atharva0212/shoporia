@@ -1,14 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { Button } from "../Button";
-import { Duration } from "./Constants/Duration";
-import { ModalState } from "./Constants/ModalState";
-import { ModalStateType } from "./type";
-import { theme } from "./Constants/theme";
 import { AnimationVariants } from "./Constants/AnimationVariants";
-import "./modal.css"
+import { ModalState } from "./Constants/ModalState";
+import "./modal.css";
+import { ModalStateType } from "./type";
 
 type ModalProps = {
   closeModal: () => void;
@@ -17,27 +15,38 @@ type ModalProps = {
 
 export function Modal({ closeModal, modal }: ModalProps) {
   useEffect(() => {
-    const duration =
-      modal.status !== ModalState.CLOSED ? modal.options.duration : Duration;
-    const timer = setTimeout(() => {
-      closeModal();
-    }, duration);
-    return () => clearTimeout(timer);
-  },[modal,closeModal]);
+    const timer =
+      modal.status !== ModalState.CLOSED &&
+      !modal.options.closeBehavior.manualClose
+        ? setTimeout(() => {
+            closeModal();
+          }, modal.options.closeBehavior.duration)
+        : null;
+    return () => {
+      if (timer) {
+        return clearTimeout(timer);
+      }
+    };
+  }, [modal, closeModal]);
+   
+
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === "Escape") {
+        closeModal();
+        return;
+      }
+    },
+    [closeModal],
+  );
 
   if (modal.status === ModalState.CLOSED) {
     return null;
   }
 
-  const { content, id, options, variant } = modal;
-const variantTheme =theme[variant];
-const modalAnimation =AnimationVariants[options.animationVariant]
-  function handleKeyDown(e: React.KeyboardEvent) {
-    if (e.key === "Escape") {
-      closeModal();
-      return;
-    }
-  }
+  const { content, id, options } = modal;
+  const modalAnimation = AnimationVariants[options.animationVariant];
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
       <div
@@ -45,18 +54,19 @@ const modalAnimation =AnimationVariants[options.animationVariant]
         aria-modal="true"
         aria-labelledby={id}
         tabIndex={-1}
-        className={`relative bg-white rounded-2xl shadow-2xl p-4 flex flex-col items-center max-w-md w-full gap-4 ${
+        className={`relative bg-white rounded-2xl shadow-2xl p-4 flex flex-col items-center w-[min(100%-2rem,28rem)] gap-4 ${
           modal.status === ModalState.OPEN
             ? modalAnimation.enter
             : modal.status === ModalState.CLOSING
-            ? modalAnimation.exit
-            : ""
+              ? modalAnimation.exit
+              : ""
         }`}
       >
         <Button
           aria-label="Close Modal"
+          onClick={closeModal}
           onKeyUp={handleKeyDown}
-          className="absolute top-4 right-4 px-2 rounded-full hover:bg-gray-100"
+          className="absolute top-4 right-4 px-2 rounded-full hover:bg-gray-100 z-99"
         >
           <Image
             src={"/icons/close.svg"}
@@ -66,19 +76,7 @@ const modalAnimation =AnimationVariants[options.animationVariant]
             className="w-5 h-5"
           />
         </Button>
-        <div
-          className="inline-flex items-center justify-center w-16 h-16 rounded-full"
-          style={{ backgroundColor: variantTheme.iconBg }}
-        >
-          <Image
-            src={variantTheme.icon.src}
-            alt={variantTheme.icon.alt}
-            width={20}
-            height={20}
-            className={`w-8 h-8`}
-          />
-        </div>
-        <div>{content}</div>
+        {content}
       </div>
     </div>
   );

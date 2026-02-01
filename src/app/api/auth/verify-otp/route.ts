@@ -55,16 +55,14 @@ export async function POST(req: NextRequest): Promise<NextResponse<LoginApiRespo
             const { email } = pendingUserRecord;
             user = new User({
                 email,
-                avatar: {
-                    character: email[0],
-                    bg: emailToColor({ email })
-                }
+                avatarBg:emailToColor({ email }),
             });
             await user.save();
         }
         await pendingUserRecord.deleteOne();
 
-        const authToken = createToken<UserJwtPayload>({ userId: user._id.toString() });
+        const userObjectId = user._id.toString();
+        const authToken = createToken<UserJwtPayload>({ userId: userObjectId });
 
         const cookieOptions: CookieOptions = {
             maxAge: parseInt(process.env.JWT_TOKEN_EXPIRY_SECONDS || "604800"),
@@ -74,7 +72,7 @@ export async function POST(req: NextRequest): Promise<NextResponse<LoginApiRespo
         await setCookie(authToken, cookieOptions);
 
         return NextResponse.json(
-            { success: true, userState: { isLoggedIn: true, avatar: user.avatar, ...(user.name ? { userName: user.name } : {}) } },
+            { success: true, userState: { isLoggedIn: true, userId: userObjectId, ...(user.name ? { userName: user.name } : {}), avatarBg: user.avatarBg } },
             { status: 200 }
         );
     } catch (error) {

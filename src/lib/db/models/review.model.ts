@@ -25,9 +25,8 @@ export const ReviewSchema = new Schema<ReviewDocument>(
     },
 );
 
-ReviewSchema.index({ productId: 1, userId: 1 });
+ReviewSchema.index({ product: 1, user: 1 });
 
 export const reviewModelName = "Review"
 
 export const Review = mongoose.models.Review ?? mongoose.model<ReviewDocument>(reviewModelName, ReviewSchema);
-console.log("relkjasf;lkj");

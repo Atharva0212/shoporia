@@ -1,6 +1,6 @@
 "use client";
 
-import { useGetProductBySlugQuery } from "@/src/app/features/productsApi";
+import { useGetProductBySlugQuery } from "@/src/app/products/[slug]/features/productsApi";
 
 import { Layout } from "@/src/app/Components/Layout";
 import { VariantFilterProvider } from "../context/variantFilter/VariantFilterProvider";
@@ -18,8 +18,6 @@ type ProductContentProps = {
 };
 
 export function ProductContent({ slug }: ProductContentProps) {
-  console.log(slug);
-
   const { data } = useGetProductBySlugQuery(slug);
   if (!data) return;
   const {
@@ -35,7 +33,7 @@ export function ProductContent({ slug }: ProductContentProps) {
     images,
     // rating,
     averageRating,
-    reviewData,
+    reviews,
     reviewCount,
     badges,
     // soldCount,
@@ -49,6 +47,7 @@ export function ProductContent({ slug }: ProductContentProps) {
     // relatedProducts,
     canReviewProduct,
   } = data;
+
   return (
     <Layout isMain={true}>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-12 mb-12 z-10">
@@ -98,7 +97,14 @@ export function ProductContent({ slug }: ProductContentProps) {
           </VariantFilterProvider>
         </div>
       </div>
-      <ReviewSection reviewData={reviewData} averageRating={averageRating} reviewCount={reviewCount} canReviewProduct={canReviewProduct}/>
+      <ReviewSection
+        productId={id}
+        slug={slug}
+        reviews={reviews}
+        averageRating={averageRating}
+        reviewCount={reviewCount}
+        canReviewProduct={canReviewProduct}
+      />
     </Layout>
   );
 }

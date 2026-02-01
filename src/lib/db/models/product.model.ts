@@ -23,6 +23,9 @@ export type ProductRecordData = {
 
   discount: number,
 
+  minPrice:number,
+  maxPrice:number,
+
   images: ImageDocument[];
   thumbnail: string;
 
@@ -31,8 +34,6 @@ export type ProductRecordData = {
   averageRating: number;
   ratingDistribution: RatingDistributionData,
   reviewCount: number;
-
-  canReviewProduct: boolean;
 
   badges?: (| "Best Seller" | "New Arrival" | "Sale" | "Trending" | "Editor's Choice" | "Premium")[];
 
@@ -72,6 +73,9 @@ export const ProductSchema = new Schema(
     variants: [VariantSchema],
 
     discount: { type: Number, required: true },
+
+    minPrice: { type: Number, required: true },
+    maxPrice: { type: Number, required: true },
 
     // Images
     images: [ImageSchema],

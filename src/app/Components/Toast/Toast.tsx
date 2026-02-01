@@ -52,7 +52,7 @@ export const Toast = forwardRef<ToastHandle, ToastProps>(function Toast(
       role="alert"
       onMouseEnter={() => handleMouseEnter(id)}
       onMouseLeave={() => handleMouseLeave(id)}
-      className={`${
+      className={`bg-white ${
         toastAnimation.enter
       } max-w-sm w-[calc(100vw-2rem)] rounded-lg border ${
         isExisting ? toastAnimation.exit : ""
@@ -81,7 +81,7 @@ export const Toast = forwardRef<ToastHandle, ToastProps>(function Toast(
         </Button>
         <div className="flex items-center pe-[5px] gap-2">
           <div
-            className="w-10 h-10 rounded-full flex items-center  justify-center"
+            className="w-10 h-10 rounded-full flex items-center justify-center"
             style={{ backgroundColor: currentTheme.icon.bgColor }}
           >
             <Image

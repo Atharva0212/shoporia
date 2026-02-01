@@ -1,47 +1,68 @@
+import { useModal } from "@/src/app/Components/Modal/Context/ModalContext";
+import { useToast } from "@/src/app/Components/Toast/Context/ToastContext";
 import { useAppSelector } from "@/src/app/store/hooks";
-import axios from "axios";
-import { useLayoutEffect, useRef, useState } from "react";
-import { PaginatedReview, ProductDetails, Reply, Review } from "../../types";
-import { Avatar } from "./Components/Avatar";
-import { CommentReply } from "./Components/CommentReply";
-import { ReplyInput } from "./Components/ReplyInput";
+import { getErrorMessage } from "@/src/utils/getErrorMessage";
+import Image from "next/image";
+import { useCallback, useLayoutEffect, useRef, useState } from "react";
+import {
+  useCreateReplyMutation,
+  useCreateReviewMutation,
+  useLoadMoreReviewsMutation,
+} from "../../features/productsApi";
+import {
+  ProductDetails,
+  ProductDetailsClient,
+  Reply,
+  Review,
+} from "../../types";
+import { ReviewSkeleton } from "../../ui/Skeleton/ReviewsSkeleton/ReviewSkeleton";
+import { StarRating } from "../StarRating/StarRating";
+import PendingReviewThread from "./Components/PendingReviewThread";
+import { ReviewForm } from "./Components/ReviewForm";
+import { ReviewThreadItem } from "./Components/ReviewThreadItem";
 import { useMentionSuggestion } from "./features/mention-suggestion/hook/useMentionSuggestion";
 import type { MentionItem } from "./features/mention-suggestion/types";
-import { ReplySkeleton } from "../../ui/Skeleton/ReviewsSkeleton/ReplySkeleton";
-import { ReviewSkeleton } from "../../ui/Skeleton/ReviewsSkeleton/ReviewSkeleton";
-import Image from "next/image";
-import { StarRating } from "../StarRating/StarRating";
-import { ReviewForm } from "./Components/ReviewForm";
+import { useCompleteProfileModal } from "@/src/hooks/useCompleteProfileModal";
 
 type ReviewSectionProps = {
-  reviewData: PaginatedReview;
+  productId: ProductDetailsClient["id"];
+  slug: string;
+  reviews: ProductDetailsClient["reviews"];
   averageRating: ProductDetails["averageRating"];
   reviewCount: ProductDetails["reviewCount"];
   canReviewProduct: boolean;
 };
 
 export function ReviewSection({
-  reviewData,
+  productId,
+  slug,
+  reviews,
   averageRating,
   reviewCount,
   canReviewProduct,
 }: ReviewSectionProps) {
-  const [paginatedReviews, setPaginatedReviews] =
-    useState<PaginatedReview>(reviewData);
+
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [activeReplyReviewId, setActiveReplyReviewId] = useState<
     Review["reviewId"] | null
   >(null);
-  const [query, setQuery] = useState("");
-  const [reviewLoading, setReviewLoading] = useState(false);
-  const [expandedReviews, setExpandedReviews] = useState<Review["reviewId"][]>(
-    [],
-  );
-  const [reviewRepliesLoading, setReviewRepliesLoading] = useState<
-    Record<Review["reviewId"], boolean>
-  >({});
 
-  const userName = useAppSelector((state) => state.user.name);
+  const [loadMoreReviews, { isLoading: isReviewLoading }] =
+    useLoadMoreReviewsMutation();
+
+  const [createReview, { isLoading: isCreatingReview }] =
+    useCreateReviewMutation();
+
+  const [createReply] = useCreateReplyMutation();
+
+  const {openCompleteProfileModal}=useCompleteProfileModal()
+
+  const [query, setQuery] = useState("");
+
+  const { setModal } = useModal();
+  const { addToast } = useToast();
+
+  const userState = useAppSelector((state) => state.user);
 
   function setQueryValue(value: string) {
     setQuery(value);
@@ -60,6 +81,14 @@ export function ReviewSection({
     updateMentionItems,
   } = useMentionSuggestion({ query, setQueryValue, inputRef });
 
+  const resetReplyQuery = useCallback(() => {
+    setQuery("");
+  }, []);
+
+  const clearActiveReplyReview = useCallback(() => {
+    setActiveReplyReviewId(null);
+  }, []);
+
   function handleReplyClick(reviewId: Review["reviewId"]) {
     setActiveReplyReviewId(reviewId);
     setQuery("");
@@ -67,9 +96,9 @@ export function ReviewSection({
   }
 
   function getMentionableUsersForReview(
-    reviewId: Review["reviewId"],
+    reviewId: ProductDetailsClient["reviews"]["reviewData"]["data"][number]["reviewId"],
   ): MentionItem[] {
-    const targetReview = paginatedReviews.data.find(
+    const targetReview = reviews.reviewData.data.find(
       (review) => review.reviewId === reviewId,
     );
     if (!targetReview) return [];
@@ -79,8 +108,8 @@ export function ReviewSection({
         id: targetReview.user.id,
         name: `@${targetReview.user.name}`,
       },
-      ...targetReview.replies.data.map((reply) =>
-        createMentionItem(reply.id, reply.userName),
+      ...targetReview.replies.list.data.map((reply) =>
+        createMentionItem(reply.userId, reply.userName),
       ),
     ];
     return mentionableUsers;
@@ -98,173 +127,23 @@ export function ReviewSection({
     updateMentionItems(mentionableUsers);
   }
 
-  function handleReplySubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    if (!activeReplyReviewId || !query) return;
-
-    if (!userName) {
-      alert("Please enter your name before adding an comment");
+  async function fetchReview() {
+    const { hasMore } = reviews.reviewData.paginationState;
+    if (!hasMore) {
+      addToast("No more reviews available.", "warning");
       return;
     }
-    const newReply: Reply = {
-      id: crypto.randomUUID(),
-      userName,
-      avatarBg: "#23ab45",
-      comment: query,
-      createdAt: new Date(),
+
+    const { createdAt, id } = reviews.reviewData.paginationState.cursor;
+    const params = {
+      createdAt,
+      id,
     };
 
-    setPaginatedReviews((prev) => ({
-      ...prev,
-      data: prev.data.map((review) =>
-        review.reviewId === activeReplyReviewId
-          ? {
-              ...review,
-              replies: {
-                ...review.replies,
-                data: [...review.replies.data, newReply],
-              },
-            }
-          : review,
-      ),
-    }));
-    setActiveReplyReviewId(null);
-    setQuery("");
-  }
-
-  async function fetchReplies(reviewId: Review["reviewId"]) {
-    const targetReview = paginatedReviews.data.find(
-      (review) => review.reviewId === reviewId,
-    );
-    if (!targetReview) return; //show toast;
-    let queryParams = {};
-    const { hasFetched } = targetReview.replies;
-    if (hasFetched) {
-      const { hasMore } = targetReview.replies.paginationState;
-      if (!hasMore) return; //show toast
-
-      const { createdAt, lastId } = targetReview.replies.paginationState.cursor;
-      queryParams = {
-        createdAt,
-        ...(lastId ? { lastId } : {}),
-      };
-    }
-    setReviewRepliesLoading((prev) => ({ ...prev, ...{ reviewId: true } }));
-    try {
-      const respose = await axios.get("", {
-        params: queryParams,
-      });
-      const { data: _ } = respose;
-    } catch (error: unknown) {
-      console.error(error);
-    } finally {
-      setReviewRepliesLoading((prev) => ({ ...prev, ...{ reviewId: false } }));
-    }
-    const newReplies: Reply[] = [
-      {
-        id: crypto.randomUUID(),
-        userName: "Nina",
-        avatarBg: "#e9ecef",
-        comment: "@George Could you provide screenshots?",
-        createdAt: new Date("2025-12-02T12:10:00Z"),
-      },
-      {
-        id: crypto.randomUUID(),
-        userName: "Oscar",
-        avatarBg: "#e9ecef",
-        comment: "This seems like a minor bug, should be fixed soon.",
-        createdAt: new Date("2025-12-02T12:30:00Z"),
-      },
-    ];
-    setPaginatedReviews((prev) => ({
-      ...prev,
-      data: prev.data.map((review) => {
-        if (review.reviewId === reviewId) {
-          const { data } = review.replies;
-          const mergedReplies = [
-            ...new Map([...data, ...newReplies].map((r) => [r.id, r])).values(),
-          ];
-          return {
-            ...review,
-            replies: {
-              paginationState: {
-                hasMore: false,
-              },
-              hasFetched: true,
-              cursor: {
-                createdAt: new Date(),
-                lastId: crypto.randomUUID(),
-              },
-              hasMore: false,
-              data: mergedReplies,
-            },
-          };
-        }
-        return review;
-      }),
-    }));
-  }
-
-  async function fetchReview() {
-    const { hasMore } = paginatedReviews.paginationState;
-    if (!hasMore) return; //show toast
-    setReviewLoading(true);
-    setTimeout(() => {
-      setReviewLoading(false);
-    }, 2000);
-    //     const queryParams={
-    // ...paginatedReviews.paginationState.cursor
-    //     }
-    //     try{
-    //       const response=await axios.get("",{params:queryParams});
-    //     }catch(error:unknown){
-    // console.error(error);
-    //     }
-    const newReview: Review[] = [
-      {
-        reviewId: "r3",
-        user: { id: "u4", name: "David", avatarBg: "#23ab45" },
-        rating: 4,
-        comment: "Good quality, but shipping was delayed.",
-        createdAt: new Date("2025-12-02T09:15:00Z"),
-        repliesCount: 3,
-        replies: {
-          hasFetched: false,
-          // cursor and hasMore can be added when replies are fetched
-          data: [
-            // {
-            //   id: "r2-reply1",
-            //   user: { id: "u5", name: "Eve" },
-            //   comment: "@David Thanks for the feedback!",
-            //   createdAt: new Date("2025-12-02T09:45:00Z"),
-            // },
-            // {
-            //   id: "r2-reply2",
-            //   user: { id: "u6", name: "Frank" },
-            //   comment: "I had a similar experience with shipping.",
-            //   createdAt: new Date("2025-12-02T10:10:00Z"),
-            // },
-            // {
-            //   id: "r2-reply3",
-            //   user: { id: "u7", name: "Grace" },
-            //   comment: "@Eve Any suggestions for faster delivery?",
-            //   createdAt: new Date("2025-12-02T10:35:00Z"),
-            // },
-          ],
-        },
-      },
-    ];
-    setPaginatedReviews((prev) => ({
-      ...prev,
-      paginationState: {
-        hasMore: false,
-      },
-      data: [
-        ...new Map(
-          [...prev.data, ...newReview].map((r) => [r.reviewId, r]),
-        ).values(),
-      ],
-    }));
+    loadMoreReviews({ productId, slug, params }).unwrap().catch(error=>{
+      const errorMessage=getErrorMessage(error,"Failed to load more reviews");
+      addToast(errorMessage,"error");
+    });
   }
 
   function openReplyInput(
@@ -272,6 +151,16 @@ export function ReviewSection({
     userName: Reply["userName"],
   ) {
     if (activeReplyReviewId !== reviewId) {
+      return;
+    }
+    const { isLoggedIn, userId, name, avatarBg } = userState;
+    if (!isLoggedIn) {
+      setModal("You need to be logged in to post a reply.", "error");
+      return;
+    }
+
+    if (!name || !userId || !avatarBg) {
+      openCompleteProfileModal();
       return;
     }
     setActiveReplyReviewId(reviewId);
@@ -283,24 +172,12 @@ export function ReviewSection({
     setMentionUsersFromReview(reviewId);
   }
 
-  function areRepliesExpanded(id: Review["reviewId"]) {
-    if (expandedReviews.includes(id)) return true;
-    return false;
-  }
-
-  function areRepliesLoading(id: Review["reviewId"]) {
-    if (reviewRepliesLoading[id]) {
-      return true;
-    }
-    return false;
-  }
-
-  function handleReplyReset() {
+  const handleReplyReset = useCallback(() => {
     setActiveReplyReviewId(null);
     setQuery("");
     closeMentionList();
     updateMentionItems([]);
-  }
+  }, [closeMentionList, updateMentionItems]);
 
   function closeReviewForm() {
     setShowReviewForm(false);
@@ -314,208 +191,145 @@ export function ReviewSection({
 
   useLayoutEffect(() => {
     if (reviewFormRef.current && showReviewForm) {
-      reviewFormRef.current.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      reviewFormRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+      });
     }
   }, [showReviewForm]);
 
+  function openReviewForm() {
+    const { isLoggedIn, userId, name, avatarBg } = userState;
+    if (!isLoggedIn) {
+      setModal("Please login before you give review", "error");
+      return;
+    }
+    if (!userId || !name || !avatarBg) {
+      openCompleteProfileModal();
+      return;
+    }
+
+    setShowReviewForm(true);
+  }
+
+  const handleReplySubmit = useCallback(
+    (
+      e: React.FormEvent<HTMLFormElement>,
+      reviewId: ProductDetailsClient["reviews"]["reviewData"]["data"][number]["reviewId"],
+    ) => {
+      e.preventDefault();
+      if (!activeReplyReviewId || !query) return;
+
+      const { isLoggedIn, userId, name, avatarBg } = userState;
+      if (!isLoggedIn) {
+        setModal("You need to be logged in to post a reply.", "error");
+        return;
+      }
+      if (!query) {
+        addToast("Reply cannot be empty", "warning");
+        return;
+      }
+      if (!name || !userId || !avatarBg) {
+        openCompleteProfileModal();
+        return;
+      }
+      createReply({
+        slug,
+        reviewId,
+        comment: query,
+        user: {
+          id: userId,
+          name,
+          avatarBg,
+        },
+      })
+        .unwrap()
+        .then(() => {
+          resetReplyQuery();
+          clearActiveReplyReview();
+        });
+    },
+    [
+      activeReplyReviewId,
+      createReply,
+      slug,
+      userState,
+      openCompleteProfileModal,
+      setModal,
+      addToast,
+      query,
+      resetReplyQuery,
+      clearActiveReplyReview,
+    ],
+  );
+
   return (
     <section className="bg-white rounded-2xl p-6 border border-divider-200">
-      {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div className="space-y-2">
           <h2 className="text-h5 font-bold text-text-900">Customer Reviews</h2>
           <div className="text-text-700 text-body-sm flex items-center gap-2">
             <StarRating rating={averageRating} />
-            <span className="font-bold">{averageRating}</span>{" "}
+            <span className="font-bold">
+              {Math.trunc(averageRating * 10) / 10}
+            </span>{" "}
             <span>Based on {reviewCount} reviews</span>
           </div>
         </div>
-        {!canReviewProduct && (
-          <button onClick={()=>setShowReviewForm(true)} className="bg-inverse text-white px-6 py-3 rounded-2xl">
+        {canReviewProduct && !isCreatingReview && (
+          <button
+            onClick={openReviewForm}
+            className="bg-inverse text-white px-6 py-3 rounded-2xl"
+          >
             Write a review
           </button>
         )}
       </div>
 
-      {!canReviewProduct && showReviewForm && (
-        <ReviewForm reviewFormRef={reviewFormRef} closeReviewForm={closeReviewForm} />
+      {canReviewProduct && showReviewForm && (
+        <ReviewForm
+          createReview={createReview}
+          reviewFormRef={reviewFormRef}
+          closeReviewForm={closeReviewForm}
+          userState={userState}
+          openCompleteProfileModal={openCompleteProfileModal}
+          setModal={setModal}
+          productId={productId}
+          slug={slug}
+        />
       )}
 
       {/* Reviews List */}
       <div className="space-y-6">
-        {paginatedReviews.data.map((review) => {
-          const {
-            reviewId,
-            user,
-            rating,
-            comment,
-            repliesCount,
-            replies,
-            createdAt,
-          } = review;
-          const isExpanded = areRepliesExpanded(reviewId);
-          const isRepliesLoading = areRepliesLoading(reviewId);
-
-          return (
-            <div
-              key={reviewId}
-              className="rounded-2xl border border-divider-200 hover:shadow-md transition-shadow"
-            >
-              <div className="p-6 pb-4">
-                <div className="flex items-start gap-4">
-                  {/* Avatar */}
-                  <Avatar initial={user.name[0]} avatarBg={user.avatarBg} />
-
-                  {/* User Info & Rating */}
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between mb-2">
-                      <h3
-                        onClick={() => openReplyInput(reviewId, user.name)}
-                        className="text-h6 font-semibold text-text-900"
-                      >
-                        {user.name}
-                      </h3>
-                      <StarRating rating={rating} />
-                    </div>
-
-                    {/* Date */}
-                    <div className="flex items-center gap-1 text-body-sm text-text-500 mb-3">
-                      <Image
-                        src={"/icons/calendar.svg"}
-                        alt=""
-                        width={16}
-                        height={16}
-                        className="w-4 h-4"
-                      />
-                      {new Date(createdAt).toLocaleDateString("en-US", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      })}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Review Comment */}
-                <p className="text-text-700 mt-3">{comment}</p>
-              </div>
-
-              {/* Review Actions */}
-              <div className="px-6 pb-4 flex items-center gap-4">
-                <button
-                  onClick={() => handleReplyClick(reviewId)}
-                  className="flex items-center gap-2 text-body-sm font-medium text-gray-600 hover:text-gray-900 transition"
-                >
-                  <Image
-                    src={"/icons/message-circle.svg"}
-                    alt=""
-                    width={16}
-                    height={16}
-                    className="w-4 h-4"
-                  />
-                  Reply
-                </button>
-
-                {repliesCount > 0 && (
-                  <button
-                    onClick={() => {
-                      setExpandedReviews((prev) => {
-                        if (prev.includes(reviewId)) {
-                          return prev.filter((p) => p !== reviewId);
-                        }
-                        return [reviewId, ...prev];
-                      });
-                      const targetReview = paginatedReviews.data.find(
-                        (review) => review.reviewId === reviewId,
-                      );
-                      if (!targetReview) return;
-                      if (!targetReview.replies.hasFetched) {
-                        fetchReplies(reviewId);
-                      }
-                    }}
-                    className="flex items-center gap-2 text-sm font-medium text-text-500 hover:text-text-900 transition"
-                  >
-                    <Image
-                      src={"/icons/chevron-down.svg"}
-                      alt=""
-                      width={16}
-                      height={16}
-                      className={`w-4 h-4 transition-transform ${
-                        isExpanded ? "rotate-180" : ""
-                      }`}
-                    />
-                    {isExpanded ? "Hide" : `View ${repliesCount}`}{" "}
-                    {repliesCount === 1 ? "Reply" : "Replies"}
-                  </button>
-                )}
-              </div>
-
-              {/* Reply Input */}
-              {activeReplyReviewId === reviewId && (
-                <ReplyInput
-                  handleReplyReset={handleReplyReset}
-                  handleReplySubmit={handleReplySubmit}
-                  inputRef={inputRef}
-                  handleQueryChange={handleQueryChange}
-                  query={query}
-                  reviewId={reviewId}
-                  mentionSuggestion={mentionSuggestion}
-                  handleKeyDown={handleKeyDown}
-                  popupRef={popupRef}
-                />
-              )}
-
-              {/* Replies List */}
-              {isExpanded && replies.data.length !== 0 && (
-                <div className="border-t border-divider-200">
-                  <div className="px-6 py-4 space-y-4">
-                    {replies.data.map((reply) => (
-                      <>
-                        <CommentReply
-                          key={reply.id}
-                          reply={reply}
-                          openReplyInput={openReplyInput}
-                          reviewId={review.reviewId}
-                        />
-                        {isRepliesLoading &&
-                          Array.from({ length: 3 }).map((_, index) => (
-                            <ReplySkeleton key={index} />
-                          ))}
-                      </>
-                    ))}
-
-                    {/* Load More Replies */}
-                    {replies.hasFetched && replies.paginationState.hasMore && (
-                      <button
-                        onClick={() => fetchReplies(reviewId)}
-                        className="text-body-sm font-medium text-text-500 hover:text-text-900 transition flex items-center gap-2"
-                      >
-                        <Image
-                          src={"/icons/chevron-down.svg"}
-                          alt=""
-                          width={16}
-                          height={16}
-                          className="w-4 h-4"
-                        />
-                        Load {repliesCount - replies.data.length} more{" "}
-                        {repliesCount - replies.data.length === 1
-                          ? "reply"
-                          : "replies"}
-                      </button>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
-          );
-        })}
+        {reviews && "pendingReview" in reviews && reviews.pendingReview && (
+          <PendingReviewThread pendingReview={reviews.pendingReview} />
+        )}
+        {reviews.reviewData.data.map((review) => (
+          <ReviewThreadItem
+            key={review.reviewId}
+            review={review}
+            slug={slug}
+            inputRef={inputRef}
+            openReplyInput={openReplyInput}
+            handleReplyClick={handleReplyClick}
+            activeReplyReviewId={activeReplyReviewId}
+            handleReplyReset={handleReplyReset}
+            handleReplySubmit={handleReplySubmit}
+            addToast={addToast}
+            handleQueryChange={handleQueryChange}
+            query={query}
+            mentionSuggestion={mentionSuggestion}
+            handleKeyDown={handleKeyDown}
+            popupRef={popupRef}
+          />
+        ))}
       </div>
-      {reviewLoading &&
+      {isReviewLoading &&
         Array.from({ length: 3 }).map((_, index) => (
           <ReviewSkeleton key={index} />
         ))}
       {/* Load More Reviews */}
-      {paginatedReviews.paginationState.hasMore && (
+      {!isReviewLoading && reviews.reviewData.paginationState.hasMore && (
         <div className="mt-8 text-center">
           <button
             onClick={fetchReview}

@@ -1,16 +1,19 @@
+import { useToast } from "@/src/app/Components/Toast/Context/ToastContext";
 import { useVariantFilter } from "../../../context/variantFilter/VariantFilterContext";
-import { Attributes } from "../../../types";
 import { hasExactVariant, isOptionSelected } from "../utils/variantFilters";
 import { handleVariantSelection } from "../utils/variantMatcher";
+import { Attributes } from "@/src/Types/types";
 
 type AttributeOptionProps<K extends keyof Attributes> = {
   attribute: K;
   attributeValue: Attributes[K];
+  addToast:ReturnType<typeof useToast>["addToast"];
 };
 
 export function AttributeOption<K extends keyof Attributes>({
   attribute,
   attributeValue,
+  addToast,
 }: AttributeOptionProps<K>) {
   const { selectedVariant, variantFilters, updateVariant } = useVariantFilter();
   const { attributes } = selectedVariant;
@@ -35,7 +38,7 @@ export function AttributeOption<K extends keyof Attributes>({
         candidateOption,
       );
       if (!candidateCheck.success) {
-        //add toast
+        addToast("No variant found","warning");
         return;
       }
       updateVariant(candidateCheck.matchedVariant, true);

@@ -5,6 +5,7 @@ export function getErrorMessage(
   error: unknown,
   fallbackMessage = "An unexpected error occurred"
 ): string {
+
   if (!error) return fallbackMessage;
 
   let errorMessage = fallbackMessage;
@@ -20,7 +21,27 @@ export function getErrorMessage(
     } else if (data.error) {
       errorMessage = data.error;
     }
+  } else if (isGenericError(error)) {
+
+    const { error:errorInfo,success } = error.data
+    if (!success) {
+      return errorInfo
+    }
   }
 
   return errorMessage;
+}
+function isGenericError(error: unknown): error is {status:number,data:GenericError} {
+  if (!error || typeof error !== "object") return false;
+
+  const e = error as Record<string, unknown>;
+
+  return (
+    "status" in e &&
+    "data" in e &&
+    e.data !== null &&
+    typeof e.data === "object" &&
+    "success" in e.data &&
+    "error" in e.data
+  );
 }

@@ -25,4 +25,15 @@ export const categories = {
   },
 } as const;
 
+export const categoryOptions = [
+  { value: "electronics", label: "Electronics" },
+  { value: "fashion", label: "Fashion" },
+  { value: "home-appliances", label: "Home Appliances" },
+  { value: "home-furniture", label: "Home Furniture" },
+  { value: "sports-and-fitness", label: "Sports And Fitness" },
+  { value: "toys-and-hobbies", label: "Toys And Hobbies" },
+] as const;
+
+export type CategoryItem=typeof categoryOptions[number];
+
 export type Category=keyof typeof categories;

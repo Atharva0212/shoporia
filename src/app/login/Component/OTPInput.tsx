@@ -1,7 +1,7 @@
 import { getErrorMessage } from "@/src/utils/getErrorMessage";
 import axios from "axios";
 import Image from "next/image";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import React, { useRef, useState } from "react";
 import { LoginApiResponse } from "../../api/auth/verify-otp/types";
 import { Button } from "../../Components/Button";
@@ -101,8 +101,8 @@ export function OTPInput({ length = 6 }: { length?: number }) {
       );
       const { data } = response;
       if(data.success){
-        const {avatar,userName}=data.userState;
-        dispatch(updateLoginStatus({isLoggedIn:true,avatar,name:userName}));
+        const {userId,userName,avatarBg}=data.userState;
+        dispatch(updateLoginStatus({isLoggedIn:true,userId,name:userName,avatarBg}));
         router.back();
       }
     } catch (error: unknown) {

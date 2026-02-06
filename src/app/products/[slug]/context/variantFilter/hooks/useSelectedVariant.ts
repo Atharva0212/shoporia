@@ -1,10 +1,10 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { Attributes } from "@/src/Types/types";
+import { useSearchParams } from "next/navigation";
+import { useCallback, useMemo, useState } from "react";
 import { getAttributes } from "../../../Components/VariantSelector/utils/getAttributes";
 import { findVariantFromAttributes } from "../../../Components/VariantSelector/utils/variantSelectors";
 import type { ProductDetails } from "../../../types";
-import { Attributes } from "@/src/Types/types";
-import { usePathname, useSearchParams } from "next/navigation";
-import { useRouter } from "next/navigation";
+import { updateQueryParams } from "@/src/utils/queryParams";
 
 type UseSelectedVariantOptions = {
   variants: ProductDetails["variants"],
@@ -24,29 +24,6 @@ function filterVariantsByUrlParams({ variants, attributes }: { variants: Product
   }, variants)
 }
 
-function syncVariantToUrl({ attributes }: { attributes: ProductDetails["variants"][number]["attributes"] }){
-const params=new URLSearchParams();
-Object.entries(attributes).forEach(([key,value])=>{
-  params.set(key,String(value));
-})
-window.history.replaceState(null,"",`?${params.toString()}`)
-}
-
-export function useVariantUrlSync({ searchParams }: { searchParams: ReturnType<typeof useSearchParams> }) {
-  const router = useRouter();
-  const pathname = usePathname();
-  const syncVariantToUrl = useCallback(({ attributes }: { attributes: ProductDetails["variants"][number]["attributes"] }) => {
-    const params = new URLSearchParams(searchParams);
-    Object.entries(attributes).forEach(([key, value]) => {
-      params.set(key, String(value));
-    })
-    router.replace(`${pathname}?${params.toString()}`, {
-      scroll: false
-    });
-  }, [router, pathname, searchParams]);
-  return { syncVariantToUrl }
-};
-
 export function useSelectedVariant({ variants }: UseSelectedVariantOptions) {
   const searchParams = useSearchParams();
 
@@ -63,7 +40,7 @@ export function useSelectedVariant({ variants }: UseSelectedVariantOptions) {
     });
     if (matchedVariant) {
       setSelectedVariant(matchedVariant);
-      syncVariantToUrl({attributes:matchedVariant.attributes});
+      updateQueryParams({queryParams:matchedVariant.attributes});
     }
   }, [variants, selectedVariant])
 

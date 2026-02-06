@@ -50,8 +50,6 @@ export function CompleteProfileModal({
         if (data.success) {
           dispatch(updateName({ name }));
           closeModal();
-          console.log(closeModal());
-
           addToast(data.message, "success");
           return;
         }

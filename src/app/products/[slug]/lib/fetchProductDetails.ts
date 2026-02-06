@@ -1,7 +1,8 @@
 import { getConnectionModel } from "@/src/lib/db/connection";
 import { ProductDocument, ProductRecordData } from "@/src/lib/db/models/product.model";
-import { PaginatedCursor, ProductDetails } from "../types";
+import { ProductDetails } from "../types";
 import { UserDocument } from "@/src/lib/db/models/user.model";
+import { PaginatedCursor } from "@/src/Types/types";
 
 export async function fetchProductDetails({ slug, userId }: { slug: ProductRecordData["slug"], userId: string | undefined }): Promise<{ success: true, data: ProductDetails } | { success: false, error: string, status: 404 | 500 }> {
     try {
@@ -64,11 +65,19 @@ function buildImageData({ images }: { images: ProductRecordData["images"] }): Pr
 }
 
 function buildReviewData({ reviews, reviewCount }: { reviews: ProductDocument["reviews"], reviewCount: ProductDocument["reviewCount"] }): ProductDetails["reviewData"] {    
+    if(reviews.length===0){
+        return{
+            data:[],
+            paginationState:{
+                hasMore:false
+            }
+        }
+    }
     const sortedReviews = [...reviews].sort(
         (a, b) => b.review.createdAt.getTime() - a.review.createdAt.getTime()
     )
 
-    const lastReview = sortedReviews[sortedReviews.length - 1].review;
+    const lastReview = sortedReviews[sortedReviews.length - 1].review;    
 
     const paginationState: PaginatedCursor = reviewCount > 5 ? { hasMore: true, cursor: { createdAt: lastReview.createdAt.getTime(), id: lastReview._id.toString() } } : { hasMore: false };
     return {

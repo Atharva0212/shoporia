@@ -6,9 +6,7 @@ import { Modal } from "../Modal";
 import { useModalController } from "../hooks/useModalController";
 
 export function ModalProvider({ children }: PropsWithChildren) {
-  const { activeModal, closeModal, setModal, openModal } = useModalController();
-  console.log(activeModal);
-  
+  const { activeModal, closeModal, setModal, openModal } = useModalController();  
   return (
     <ModalContext.Provider value={{ setModal, openModal, closeModal }}>
       {children}

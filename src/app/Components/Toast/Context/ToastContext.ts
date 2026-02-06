@@ -1,10 +1,10 @@
 "use client";
 
 import { createContext, useContext } from "react";
-import { useToastController } from "../hooks/useToastController";
+import { AddToast } from "../types";
 
 type ToastContextType={
-    addToast:ReturnType<typeof useToastController>["addToast"];
+    addToast:AddToast;
 }
 
 export const ToastContext=createContext<ToastContextType|null>(null);

@@ -1,10 +1,12 @@
 "use client";
 
 import { AppPreloadedState } from "@/src/Types/redux";
-import { PropsWithChildren } from "react";
+import { PropsWithChildren, useEffect } from "react";
 import { Provider } from "react-redux";
-import { initialCartState } from "../features/cart/cartSlice";
 import { makeStore } from "../store/store";
+import { useAppDispatch } from "../store/hooks";
+import { rehydrateCart } from "../features/cart/cartSlice";
+import { getPersistedCart } from "../products/[slug]/Components/ProductActions/utils/cartStorage";
 
 type ReduxProviderProps = PropsWithChildren & {
   preloadedState: AppPreloadedState;
@@ -14,6 +16,25 @@ export function ReduxStoreProvider({
   preloadedState,
   children,
 }: ReduxProviderProps) {
-  const store = makeStore({ ...preloadedState, cart: initialCartState });
-  return <Provider store={store}>{children}</Provider>;
+  const store = makeStore({ ...preloadedState, cart: { items: [] } });
+  return (
+    <Provider store={store}>
+      <StateHydrator>{children}</StateHydrator>
+    </Provider>
+  );
+}
+
+function StateHydrator({ children }: PropsWithChildren) {
+  const dispatch = useAppDispatch();
+  useEffect(
+    function () {
+      dispatch(
+        rehydrateCart({
+          items: getPersistedCart()?.items ?? [],
+        }),
+      );
+    },
+    [dispatch],
+  );
+  return children;
 }

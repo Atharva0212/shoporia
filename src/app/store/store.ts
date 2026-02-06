@@ -2,6 +2,7 @@ import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { cartReducer } from "../features/cart/cartSlice";
 import { userReducer } from "../features/user/userSlice";
 import { productApi } from "../products/[slug]/features/productsApi";
+import { cartListenerMiddleware } from "../features/cart/cartListener";
 
 const rootReducer = combineReducers({
     [productApi.reducerPath]:productApi.reducer,
@@ -16,7 +17,7 @@ export function makeStore(preloadedState: Partial<RootState>) {
         reducer: rootReducer,
         preloadedState,
             middleware: (getDefaultMiddleware) =>{
-      return getDefaultMiddleware().concat(productApi.middleware)
+      return getDefaultMiddleware().concat(productApi.middleware,cartListenerMiddleware.middleware)
     }
     })
 }

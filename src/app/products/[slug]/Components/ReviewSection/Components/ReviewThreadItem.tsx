@@ -1,4 +1,4 @@
-import { useToast } from "@/src/app/Components/Toast/Context/ToastContext";
+import { AddToast } from "@/src/app/Components/Toast/types";
 import { getErrorMessage } from "@/src/utils/getErrorMessage";
 import Image from "next/image";
 import React, { RefObject, useState } from "react";
@@ -26,7 +26,7 @@ type ReviewProps = {
     e: React.FormEvent<HTMLFormElement>,
     reviewId: ProductDetailsClient["reviews"]["reviewData"]["data"][number]["reviewId"],
   ) => void;
-  addToast: ReturnType<typeof useToast>["addToast"];
+  addToast: AddToast;
   handleQueryChange: ReturnType<
     typeof useMentionSuggestion
   >["handleQueryChange"];

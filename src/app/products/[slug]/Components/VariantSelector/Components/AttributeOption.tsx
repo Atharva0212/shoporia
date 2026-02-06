@@ -1,13 +1,13 @@
-import { useToast } from "@/src/app/Components/Toast/Context/ToastContext";
+import { Attributes } from "@/src/Types/types";
+import { AddToast } from "@/src/app/Components/Toast/types";
 import { useVariantFilter } from "../../../context/variantFilter/VariantFilterContext";
 import { hasExactVariant, isOptionSelected } from "../utils/variantFilters";
 import { handleVariantSelection } from "../utils/variantMatcher";
-import { Attributes } from "@/src/Types/types";
 
 type AttributeOptionProps<K extends keyof Attributes> = {
   attribute: K;
   attributeValue: Attributes[K];
-  addToast:ReturnType<typeof useToast>["addToast"];
+  addToast:AddToast;
 };
 
 export function AttributeOption<K extends keyof Attributes>({

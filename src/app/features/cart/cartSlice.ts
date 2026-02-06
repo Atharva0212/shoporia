@@ -1,7 +1,6 @@
+import { Attributes } from "@/src/Types/types";
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import { ProductDetails } from "../../products/[slug]/types";
-import { Attributes } from "@/src/Types/types";
-import { getPersistedCart } from "../../products/[slug]/Components/ProductActions/utils/cartStorage";
 
 export type CartItem = {
     productId: ProductDetails["id"],
@@ -21,13 +20,16 @@ export type CartItem = {
 export type CartState = { items: CartItem[] };
 
 export const initialCartState: CartState = {
-    items: getPersistedCart()?.items??[],
+    items: [],
 }
 
 const cartSlice = createSlice({
     name: "cart",
     initialState:initialCartState,
     reducers: {
+        rehydrateCart:(_state,action:PayloadAction<CartState>)=>{
+            return action.payload
+        },
         addToCart: (state, action: PayloadAction<{ product: CartItem }>) => {
             state.items.push(action.payload.product);
         },
@@ -46,6 +48,6 @@ const cartSlice = createSlice({
     }
 })
 
-export const { addToCart,increaseProductQuantity,decreaseProductQuantity,removeProductFromCart } = cartSlice.actions;
+export const { rehydrateCart,addToCart,increaseProductQuantity,decreaseProductQuantity,removeProductFromCart } = cartSlice.actions;
 
 export const cartReducer = cartSlice.reducer;

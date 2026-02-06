@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useProductPurchase } from "../context/productPurchaseQuantity/ProductPurchaseContext";
 import { useVariantFilter } from "../context/variantFilter/VariantFilterContext";
 
 export function QuantitySelector() {
   const { selectedVariant } = useVariantFilter();
   const { stock } = selectedVariant;
-  const [quantity, setQuantity] = useState(1);
+  const {quantity,decrementQuantity,incrementQuantity}=useProductPurchase();
   const clampedQuantity = Math.min(quantity, stock);
 
   return (
@@ -17,7 +17,7 @@ export function QuantitySelector() {
           <div className="flex items-center gap-3">
             <div className="flex items-center border-2 border-gray-300 rounded-xl">
               <button
-                onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                onClick={decrementQuantity}
                 className="p-3 hover:bg-gray-50 transition"
               >
                 -
@@ -26,7 +26,7 @@ export function QuantitySelector() {
                 {clampedQuantity}
               </span>
               <button
-                onClick={() => setQuantity(Math.min(stock, quantity + 1))}
+                onClick={() => incrementQuantity(stock)}
                 className="p-3 hover:bg-gray-50 transition"
               >
                 +

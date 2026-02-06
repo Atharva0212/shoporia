@@ -12,6 +12,7 @@ import { ProductTags } from "./ProductTags";
 import { QuantitySelector } from "./QuantitySelector";
 import { ReviewSection } from "./ReviewSection/ReviewSection";
 import { VariantSelector } from "./VariantSelector/VariantSelector";
+import { ProductPurchaseProvider } from "../context/productPurchaseQuantity/ProductPurchaseProvider";
 
 type ProductContentProps = {
   slug: string;
@@ -84,16 +85,17 @@ export function ProductContent({ slug }: ProductContentProps) {
 
           <VariantFilterProvider variants={variants}>
             <ProductPriceDetails productDiscount={discount} />
+              <VariantSelector />
 
-            <VariantSelector />
+            <ProductPurchaseProvider>
+              <QuantitySelector />
 
-            <QuantitySelector />
-
-            <ProductActions
-              productId={id}
-              productName={name}
-              productImages={images}
-            />
+              <ProductActions
+                productId={id}
+                productName={name}
+                productImages={images}
+              />
+            </ProductPurchaseProvider>
           </VariantFilterProvider>
         </div>
       </div>

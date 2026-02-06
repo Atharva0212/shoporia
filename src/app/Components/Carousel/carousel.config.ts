@@ -5,5 +5,5 @@ type Setting = {
 
 export const setting: Setting = {
     defaultSlidingDirection: "right",
-    slideDuration: 5000,
+    slideDuration: 6000,
 };

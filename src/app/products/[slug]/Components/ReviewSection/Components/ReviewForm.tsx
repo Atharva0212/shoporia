@@ -33,7 +33,6 @@ export function ReviewForm({
 
   function handleReviewSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    console.log("sub");
     const { isLoggedIn, userId, name, avatarBg } = userState;
     if (!isLoggedIn) {
       setModal("Please login before you give review", "error");

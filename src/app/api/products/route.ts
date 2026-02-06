@@ -13,11 +13,12 @@ export async function GET(req: NextRequest): Promise<NextResponse<DataApiRespons
         const updatedAt = updatedAtTimestamp ? new Date(updatedAtTimestamp) : new Date();
         const id = searchParams.get("id");
         const categoryParam = searchParams.get("category");
-        const category = categoryParam ? getValidCategory(categoryParam) : null;
+        const rawCategories = categoryParam ? categoryParam.split(",") : [];
+        const validCategories = rawCategories.length > 0 ? getValidCategories(rawCategories) : null;
         const query = searchParams.get("query");
         const maxPrice = parseNumber(searchParams.get("maxPrice"), null);
         const priceRange = maxPrice ? { minPrice: 0, maxPrice } : undefined
-        const productCards = await fetchProductCards({ cursor: { updatedAt, id }, category, priceRange, query })
+        const productCards = await fetchProductCards({ cursor: { updatedAt, id }, category: validCategories, priceRange, query })
         return NextResponse.json({ success: true, responseData: productCards }, { status: 200 });
     } catch {
         return NextResponse.json({ success: false, error: "Internal server error" }, { status: 500 });
@@ -25,17 +26,23 @@ export async function GET(req: NextRequest): Promise<NextResponse<DataApiRespons
 
 }
 
-function getValidCategory(categoryParam: string | null): CategoryItem["value"] | null {
-    return categoryOptions.find(option => option.value === categoryParam)?.value ?? null
+function getValidCategories(categoryParams: string[]): CategoryItem["value"][] | null {
+    const valid = categoryParams.reduce<CategoryItem["value"][]>((acc, curr) => {
+        if (categoryOptions.some(option => option.value === curr)) {
+            acc.push(curr as CategoryItem["value"])
+        }
+        return acc
+    }, [])
+    return valid.length > 0 ? valid : null
 }
 
-async function fetchProductCards({ cursor, category, priceRange, query }: { cursor: { updatedAt: Date, id: string | null }, category: CategoryItem["value"] | null, priceRange?: { minPrice: number, maxPrice: number }, query: string | null }): Promise<PaginatedProductCards> {
+async function fetchProductCards({ cursor, category, priceRange, query }: { cursor: { updatedAt: Date, id: string | null }, category: CategoryItem["value"][] | null, priceRange?: { minPrice: number, maxPrice: number }, query: string | null }): Promise<PaginatedProductCards> {
     const LIMIT = 10;
     const { updatedAt, id } = cursor;
     const filter = {
         updatedAt: { $lt: updatedAt },
         ...(id ? { _id: { $lt: id } } : {}),
-        ...(category ? { category } : {}),
+        ...(category ? { category: { $in: category } } : {}),
         ...(priceRange
             ? {
                 minPrice: { $lte: priceRange.maxPrice },

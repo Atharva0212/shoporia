@@ -16,7 +16,7 @@ export function createCartItem({
         productId: product.productId,
         productName,
         image: {
-            src: bestMatchImageVariant.src,
+            src: bestMatchImageVariant.url,
             alt: productName,
         },
         variantAttributes: selectedVariant.attributes,

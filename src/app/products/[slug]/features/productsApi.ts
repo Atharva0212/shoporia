@@ -1,8 +1,9 @@
 import { DataApiResponse } from "@/src/Types/response";
 import { CreateReviewApiResponse } from "@/src/app/api/products/[slug]/reviews/route";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { PaginatedResult, PaginatedReview, ProductDetails, ProductDetailsClient, Reply, Review, ReviewClient } from "../types";
+import { PaginatedReview, ProductDetails, ProductDetailsClient, Reply, Review, ReviewClient } from "../types";
 import { CreateReplyApiResponse } from "@/src/app/api/products/reviews/[slug]/replies/route";
+import { PaginatedResult } from "@/src/Types/types";
 
 type CreateReviewPayload = {
     slug: string;
@@ -42,7 +43,7 @@ export const productApi = createApi({
             },
             transformResponse(baseQueryReturnValue) {
                 if (!baseQueryReturnValue.success) {
-                    throw new Error(baseQueryReturnValue.error)
+                    throw new Error(baseQueryReturnValue.error);
                 };
                 return {
                     ...baseQueryReturnValue.responseData,

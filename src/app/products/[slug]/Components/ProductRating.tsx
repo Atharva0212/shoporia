@@ -13,7 +13,7 @@ export function ProductRating({ averageRating, reviewCount }: ProductRatingProps
           <StarRating rating={averageRating} />
         </div>
         <span className="text-body-sm font-semibold text-gray-900">
-          {averageRating}
+          {Math.trunc(averageRating * 10) / 10}
         </span>
       </div>
       <span className="text-body-sm text-gray-500">({reviewCount})</span>

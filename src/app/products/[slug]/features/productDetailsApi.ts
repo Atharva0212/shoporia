@@ -30,7 +30,7 @@ type LoadMoreRepliesParams = {
 }
 
 
-export const productApi = createApi({
+export const productDetailsApi = createApi({
     reducerPath: "productsApi",
     baseQuery: fetchBaseQuery({
         baseUrl: '/api/products',
@@ -73,7 +73,7 @@ export const productApi = createApi({
             async onQueryStarted(queryArgument, { dispatch, queryFulfilled }) {
                 const { slug, rating, comment, user } = queryArgument;
                 const clientReviewId = crypto.randomUUID();
-                const patchRequest = dispatch(productApi.util.updateQueryData("getProductBySlug", slug, (draft) => {
+                const patchRequest = dispatch(productDetailsApi.util.updateQueryData("getProductBySlug", slug, (draft) => {
                     draft.reviews.pendingReview = {
                         clientReviewId,
                         rating,
@@ -86,11 +86,11 @@ export const productApi = createApi({
                     if (data.success) {
                         const { reviewId, averageRating } = data.responseData;
                         dispatch(
-                            productApi.util.updateQueryData(
+                            productDetailsApi.util.updateQueryData(
                                 "getProductBySlug",
                                 slug,
                                 (draft) => {
-                                    draft.canReviewProduct=false;
+                                    draft.canReviewProduct = false;
                                     draft.averageRating = averageRating;
                                     draft.reviews.pendingReview = undefined;
 
@@ -134,7 +134,7 @@ export const productApi = createApi({
                     const { data } = await queryFulfilled;
                     if (data.success) {
                         const { data: newReviewData, paginationState } = data.responseData;
-                        dispatch(productApi.util.updateQueryData("getProductBySlug", slug, (draft) => {
+                        dispatch(productDetailsApi.util.updateQueryData("getProductBySlug", slug, (draft) => {
                             const reviewClients: ReviewClient[] = newReviewData.map(review => ({
                                 ...review,
                                 replies: {
@@ -162,13 +162,13 @@ export const productApi = createApi({
             },
             async onQueryStarted({ slug, reviewId, comment, user }, { dispatch, queryFulfilled }) {
                 const replyId = crypto.randomUUID();
-                const patchRequest = dispatch(productApi.util.updateQueryData("getProductBySlug", slug, (draft) => {
+                const patchRequest = dispatch(productDetailsApi.util.updateQueryData("getProductBySlug", slug, (draft) => {
                     const review = draft.reviews.reviewData.data.find(r => r.reviewId === reviewId);
                     if (!review) return;
                     review.replies.pendingReply = {
                         id: replyId,
                         comment,
-                        userId:user.id,
+                        userId: user.id,
                         avatarBg: user.avatarBg,
                         userName: user.name
                     }
@@ -177,14 +177,14 @@ export const productApi = createApi({
                     const { data } = await queryFulfilled;
                     if (data.success) {
                         const { replyId } = data.responseData;
-                        dispatch(productApi.util.updateQueryData("getProductBySlug", slug, (draft) => {
+                        dispatch(productDetailsApi.util.updateQueryData("getProductBySlug", slug, (draft) => {
                             const review = draft.reviews.reviewData.data.find(r => r.reviewId === reviewId);
                             if (!review) return;
                             review.replies.pendingReply = undefined;
                             review.replies.list.data.unshift({
                                 id: replyId,
                                 comment,
-                                userId:user.id,
+                                userId: user.id,
                                 userName: user.name,
                                 avatarBg: user.avatarBg,
                                 createdAt: new Date().getTime(),
@@ -199,7 +199,7 @@ export const productApi = createApi({
         }),
         loadMoreReplies: builder.mutation<DataApiResponse<PaginatedResult<Reply>>, LoadMoreRepliesParams>({
             query(args) {
-                const {  reviewId, params } = args;
+                const { reviewId, params } = args;
                 return {
                     url: `/reviews/${reviewId}/replies`,
                     method: "GET",
@@ -211,7 +211,7 @@ export const productApi = createApi({
                     const { data } = await queryFulfilled;
                     if (data.success) {
                         const { data: newRepliesData, paginationState } = data.responseData;
-                        dispatch(productApi.util.updateQueryData("getProductBySlug", slug, (draft) => {
+                        dispatch(productDetailsApi.util.updateQueryData("getProductBySlug", slug, (draft) => {
                             const review = draft.reviews.reviewData.data.find(r => r.reviewId === reviewId);
                             if (!review) return;
                             const prevData =
@@ -244,4 +244,4 @@ function getUniqueReplies({ existingReplies, newReplies }: { existingReplies: Re
     return Array.from(map.values());
 }
 
-export const { useGetProductBySlugQuery, useLoadMoreReviewsMutation, useCreateReviewMutation, useLoadMoreRepliesMutation, useCreateReplyMutation } = productApi;
+export const { useGetProductBySlugQuery, useLoadMoreReviewsMutation, useCreateReviewMutation, useLoadMoreRepliesMutation, useCreateReplyMutation } = productDetailsApi;

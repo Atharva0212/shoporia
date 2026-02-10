@@ -1,6 +1,6 @@
 import { RefObject, useRef, useState } from "react";
-import { Star } from "../../StarRating/StarRating";
-import { useCreateReviewMutation } from "../../../features/productsApi";
+import { Star } from "../../../../../Components/StarRating/StarRating";
+import { useCreateReviewMutation } from "../../../features/productDetailsApi";
 import { UserState } from "@/src/app/features/user/userSlice";
 import { useModal } from "@/src/app/Components/Modal/Context/ModalContext";
 import { ProductDetailsClient } from "../../../types";

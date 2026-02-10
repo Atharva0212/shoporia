@@ -105,6 +105,12 @@ export const ProductSchema = new Schema(
   }
 );
 
+ProductSchema.index({
+  name: 'text',
+  brand: 'text',
+});
+
+
 export const productModelName = "Product"
 
 export const Product = mongoose.models.Product ?? mongoose.model<ProductDocument>(productModelName, ProductSchema);

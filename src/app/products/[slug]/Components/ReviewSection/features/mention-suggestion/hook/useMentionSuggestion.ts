@@ -20,8 +20,6 @@ type ActiveMentionSuggestion = {
 type MentionPostion = | "top" | "bottom";
 
 function dedupeMentions(mentionItems:MentionItem[]):MentionItem[]{
-    console.log(mentionItems);
-    
     const map=new Map([...mentionItems.map(item=>[item.id,item] as const)])
     return Array.from(map.values());
 }

@@ -7,13 +7,14 @@ export function createCartItem({
     bestMatchImageVariant,
     selectedVariant,
 }: {
-    product: { productId: ProductDetails["id"], productName: ProductDetails["name"] }
+    product: { productId: ProductDetails["id"], productName: ProductDetails["name"],slug:ProductDetails["slug"] },
     bestMatchImageVariant: ProductDetails["images"][number];
     selectedVariant: ReturnType<typeof useVariantFilter>["selectedVariant"];
 }): CartItem {
     const {productName}=product;
     return {
         productId: product.productId,
+        slug:product.slug,
         productName,
         image: {
             src: bestMatchImageVariant.url,

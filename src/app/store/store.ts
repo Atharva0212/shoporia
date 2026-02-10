@@ -1,11 +1,15 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { cartReducer } from "../features/cart/cartSlice";
 import { userReducer } from "../features/user/userSlice";
-import { productApi } from "../products/[slug]/features/productsApi";
+import { productDetailsApi } from "../products/[slug]/features/productDetailsApi";
 import { cartListenerMiddleware } from "../features/cart/cartListener";
+import { productListingApi } from "../products/ProductListing/features/productListingApi";
+import { productListFiltersReducer } from "../products/ProductListing/features/productListFilters.slice";
 
 const rootReducer = combineReducers({
-    [productApi.reducerPath]:productApi.reducer,
+    [productDetailsApi.reducerPath]:productDetailsApi.reducer,
+    [productListingApi.reducerPath]:productListingApi.reducer,
+    productListFilters:productListFiltersReducer,
     cart: cartReducer,
     user: userReducer,
 })
@@ -17,7 +21,7 @@ export function makeStore(preloadedState: Partial<RootState>) {
         reducer: rootReducer,
         preloadedState,
             middleware: (getDefaultMiddleware) =>{
-      return getDefaultMiddleware().concat(productApi.middleware,cartListenerMiddleware.middleware)
+      return getDefaultMiddleware().concat(productDetailsApi.middleware,cartListenerMiddleware.middleware,productListingApi.middleware)
     }
     })
 }

@@ -4,22 +4,23 @@ import {
   removeProductFromCart,
 } from "@/src/app/features/cart/cartSlice";
 import { useAppDispatch, useAppSelector } from "@/src/app/store/hooks";
+import { handleCheckout } from "@/src/utils/checkout";
 import Image from "next/image";
 import { useProductPurchase } from "../../context/productPurchaseQuantity/ProductPurchaseContext";
 import { useVariantFilter } from "../../context/variantFilter/VariantFilterContext";
 import { ProductDetails } from "../../types";
-import { getPersistedCart, persistCart } from "./utils/cartStorage";
 import { createCartItem } from "./utils/createCartItem";
-import { handleCheckout } from "@/src/utils/checkout";
 
 type ProductActionsProps = {
   productId: ProductDetails["id"];
+  slug:ProductDetails["slug"];
   productName: ProductDetails["name"];
   productImages: ProductDetails["images"];
 };
 
 export function ProductActions({
   productId,
+  slug,
   productName,
   productImages,
 }: ProductActionsProps) {
@@ -35,23 +36,19 @@ export function ProductActions({
   function handleCartButtonClick() {
     if (isVariantInCart) {
       dispatch(removeProductFromCart({ productId }));
-      const cart = getPersistedCart();
-      if (!cart) return;
-      const newCart = cart.items.filter((item) => item.productId !== productId);
-      persistCart({ items: newCart });
-      return;
     }
 
-    const product = createCartItem({
+    const cartItem = createCartItem({
       product: {
         productId,
+        slug,
         productName,
       },
       bestMatchImageVariant:
         productImages.find((image) => image.isPrimary) ?? productImages[0],
       selectedVariant,
     });
-    dispatch(addToCart({ product }));
+    dispatch(addToCart({ product: cartItem }));
   }
 
   async function handleShare() {
@@ -101,17 +98,16 @@ export function ProductActions({
         </button>
       </div>
       <button
-        onClick={() =>{
-          const pathName=window.location.pathname;
+        onClick={() => {
+          const pathName = window.location.pathname;
           handleCheckout({
             productId,
             sku: selectedVariant.sku,
             pathName,
             quantity,
             addToast,
-          })
-        }
-        }
+          });
+        }}
         disabled={!selectedVariant || selectedVariant.stock === 0}
         className="w-full bg-white text-gray-900 py-4 rounded-xl font-semibold border-2 border-gray-900 hover:bg-gray-50 transition disabled:opacity-50 disabled:cursor-not-allowed"
       >

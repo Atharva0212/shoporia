@@ -3,7 +3,7 @@ import { createToken, UserJwtPayload, verifyToken } from "@/src/utils/jwt";
 import { NextRequest, NextResponse } from "next/server";
 import { AUTH_TOKEN_COOKIE, EMAIL_VERIFICATION_COOKIE } from "../Constants/auth";
 import { TempUserTokenPayload } from "../types";
-import { LoginApiResponse } from "./types";
+import { LoginApiResponse } from "../types";
 import { CookieOptions, setCookie } from "@/src/utils/cookies";
 import { emailToColor } from "./utils/emailToColor";
 
@@ -55,7 +55,7 @@ export async function POST(req: NextRequest): Promise<NextResponse<LoginApiRespo
             const { email } = pendingUserRecord;
             user = new User({
                 email,
-                avatarBg:emailToColor({ email }),
+                avatarBg:emailToColor(email),
             });
             await user.save();
         }

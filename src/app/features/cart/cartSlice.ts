@@ -4,6 +4,7 @@ import { ProductDetails } from "../../products/[slug]/types";
 
 export type CartItem = {
     productId: ProductDetails["id"],
+    slug:ProductDetails["slug"],
     productName: ProductDetails["name"],
     image: {
         src: string,

@@ -1,4 +1,4 @@
-import { StarRating } from "./StarRating/StarRating";
+import { StarRating } from "../../../Components/StarRating/StarRating";
 
 type ProductRatingProps = {
   averageRating: number;

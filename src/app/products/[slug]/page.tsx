@@ -1,5 +1,5 @@
 import { PageNotFound } from '../../Components/PageNotFound';
-import { ProductContent } from './Components/ProductContent';
+import { ProductDetailsContent } from './Components/ProductDetailsContent';
 
 export default async function Page({params}:{params:Promise<{slug:string|undefined}>}) {
   const {slug}=await params;
@@ -10,6 +10,6 @@ export default async function Page({params}:{params:Promise<{slug:string|undefin
     )
   }
   return (
-    <ProductContent slug={slug}/>
+    <ProductDetailsContent slug={slug}/>
   )
 }

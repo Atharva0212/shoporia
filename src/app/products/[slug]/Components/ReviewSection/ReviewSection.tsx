@@ -8,7 +8,7 @@ import {
   useCreateReplyMutation,
   useCreateReviewMutation,
   useLoadMoreReviewsMutation,
-} from "../../features/productsApi";
+} from "../../features/productDetailsApi";
 import {
   ProductDetails,
   ProductDetailsClient,
@@ -16,7 +16,7 @@ import {
   Review,
 } from "../../types";
 import { ReviewSkeleton } from "../../ui/Skeleton/ReviewsSkeleton/ReviewSkeleton";
-import { StarRating } from "../StarRating/StarRating";
+import { StarRating } from "../../../../Components/StarRating/StarRating";
 import PendingReviewThread from "./Components/PendingReviewThread";
 import { ReviewForm } from "./Components/ReviewForm";
 import { ReviewThreadItem } from "./Components/ReviewThreadItem";

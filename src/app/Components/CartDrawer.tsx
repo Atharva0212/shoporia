@@ -8,6 +8,8 @@ import {
 } from "../features/cart/cartSlice";
 import { getPersistedCart } from "../products/[slug]/Components/ProductActions/utils/cartStorage";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { useRouter } from "next/navigation";
+import { NextJsRouter } from "@/src/Types/types";
 
 type CartDrawerProps = {
   isCartOpen: boolean;
@@ -20,8 +22,8 @@ export function CartDrawer({
 }: CartDrawerProps) {
   const cartItems = useAppSelector((state) => state.cart.items);
   const dispatch = useAppDispatch();
+  const router=useRouter();
 
-  // Calculate totals
   const subtotal = cartItems.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0,
@@ -120,6 +122,7 @@ export function CartDrawer({
               {cartItems.map((item) => (
                 <CartItemRow
                   key={item.productId}
+                  router={router}
                   cartItem={item}
                   handleRemoveFromCart={handleRemoveFromCart}
                   decreaseQuantity={decreaseQuantity}
@@ -169,6 +172,7 @@ export function CartDrawer({
 }
 
 type CartItemRowProps={
+  router:NextJsRouter;
   cartItem: CartItem;
   handleRemoveFromCart:(productId:CartItem["productId"])=>void,
   decreaseQuantity:(productId:CartItem["productId"])=>void,
@@ -176,13 +180,13 @@ type CartItemRowProps={
 }
 
 function CartItemRow({
+  router,
   cartItem,
   handleRemoveFromCart,
   decreaseQuantity,
   increaseQuantity,
 }: CartItemRowProps) {
   const isMaxQuantity = cartItem.quantity >= cartItem.stock;
-
   return (
     <div
       key={cartItem.productId}
@@ -190,13 +194,13 @@ function CartItemRow({
     >
       <div className="grid grid-cols-2 gap-3 sm:gap-4">
         <div>
-          <div className="aspect-square bg-white border border-divider-200 rounded-xl ">
+          <div className="bg-white border border-divider-200 rounded-xl ">
             <Image
               src={cartItem.image.src}
               alt={cartItem.image.src}
-              width={96}
-              height={96}
-              className="w-full h-full object-contain rounded-xl  "
+              width={200}
+              height={200}
+              className="object-contain rounded-xl "
             />
           </div>
         </div>
@@ -221,6 +225,7 @@ function CartItemRow({
                 )}
               </div>
             </div>
+            <div className="flex flex-col">
             <button
               onClick={() => handleRemoveFromCart(cartItem.productId)}
               className="p-1.5 hover:bg-red-50 rounded-lg transition shrink-0"
@@ -234,6 +239,20 @@ function CartItemRow({
                 className="w-4 h-4"
               />
             </button>
+            <button
+              onClick={()=>router.push(`/products/${cartItem.slug}`)}
+              className="p-1.5 hover:bg-red-50 rounded-lg transition shrink-0"
+              aria-label="View item"
+            >
+              <Image
+                src={"/icons/eye.svg"}
+                alt=""
+                width={20}
+                height={20}
+                className="w-5 h-5"
+              />
+            </button>
+          </div>
           </div>
 
           {/* Price */}

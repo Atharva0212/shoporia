@@ -1,5 +1,5 @@
 import { ProductDetailsClient } from "../../../types";
-import { StarRating } from "../../StarRating/StarRating";
+import { StarRating } from "../../../../../Components/StarRating/StarRating";
 import { Avatar } from "./Avatar";
 
 export default function PendingReviewThread({

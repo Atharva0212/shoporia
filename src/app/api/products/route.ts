@@ -3,14 +3,22 @@ import { DataApiResponse } from "@/src/Types/response";
 import { parseNumber } from "@/src/utils/parseNumber";
 import { NextRequest, NextResponse } from "next/server";
 import { CategoryItem, categoryOptions } from "../../Constants/categories";
-import { PaginatedProductCards, ProductCard, RawProductCard } from "../../productListing/types";
+import { toMongoObjectId } from "@/src/utils/objectId";
+import { PaginatedProductCards, ProductCard, RawProductCard } from "../../products/ProductListing/types";
 
 export async function GET(req: NextRequest): Promise<NextResponse<DataApiResponse<PaginatedProductCards>>> {
     try {
+
         const { searchParams } = new URL(req.url);
         const updatedAtStr = searchParams.get("updatedAt");
-        const updatedAtTimestamp = parseNumber<null>(updatedAtStr, null);
-        const updatedAt = updatedAtTimestamp ? new Date(updatedAtTimestamp) : new Date();
+
+        const updatedAtTimestamp = parseNumber(updatedAtStr, null);
+
+        const updatedAt = updatedAtTimestamp
+            ? new Date(updatedAtTimestamp)
+            : new Date();
+
+
         const id = searchParams.get("id");
         const categoryParam = searchParams.get("category");
         const rawCategories = categoryParam ? categoryParam.split(",") : [];
@@ -20,10 +28,11 @@ export async function GET(req: NextRequest): Promise<NextResponse<DataApiRespons
         const priceRange = maxPrice ? { minPrice: 0, maxPrice } : undefined
         const productCards = await fetchProductCards({ cursor: { updatedAt, id }, category: validCategories, priceRange, query })
         return NextResponse.json({ success: true, responseData: productCards }, { status: 200 });
-    } catch {
+    } catch(e) {
+        console.error(e);
+        
         return NextResponse.json({ success: false, error: "Internal server error" }, { status: 500 });
     }
-
 }
 
 function getValidCategories(categoryParams: string[]): CategoryItem["value"][] | null {
@@ -37,11 +46,12 @@ function getValidCategories(categoryParams: string[]): CategoryItem["value"][] |
 }
 
 async function fetchProductCards({ cursor, category, priceRange, query }: { cursor: { updatedAt: Date, id: string | null }, category: CategoryItem["value"][] | null, priceRange?: { minPrice: number, maxPrice: number }, query: string | null }): Promise<PaginatedProductCards> {
+    
     const LIMIT = 10;
     const { updatedAt, id } = cursor;
     const filter = {
         updatedAt: { $lt: updatedAt },
-        ...(id ? { _id: { $lt: id } } : {}),
+        ...(id ? { _id: { $lt: toMongoObjectId(id) } } : {}),
         ...(category ? { category: { $in: category } } : {}),
         ...(priceRange
             ? {
@@ -51,6 +61,7 @@ async function fetchProductCards({ cursor, category, priceRange, query }: { curs
             : {}),
         ...(query ? { $text: { $search: query } } : {}),
     };
+    
     const Product = await getConnectionModel("Product");
     const productRecords = await Product.aggregate<RawProductCard>([
         {
@@ -68,6 +79,7 @@ async function fetchProductCards({ cursor, category, priceRange, query }: { curs
         {
             $project: {
                 _id: 1,
+                slug:1,
                 name: 1,
                 variants: 1,
                 minPrice: 1,
@@ -82,6 +94,10 @@ async function fetchProductCards({ cursor, category, priceRange, query }: { curs
             }
         }
     ]);
+    console.log(productRecords.map(p=>p.variants)
+    );
+    
+
     return buildProductCards(productRecords, LIMIT);
 }
 
@@ -100,6 +116,7 @@ function buildProductCards(productRecords: RawProductCard[], LIMIT: number): Pag
     const productCards: ProductCard[] = productRecords.map(product => {
         const {
             _id,
+            slug,
             name,
             variants,
             minPrice,
@@ -113,12 +130,15 @@ function buildProductCards(productRecords: RawProductCard[], LIMIT: number): Pag
         } = product;
         return {
             productId: _id.toString(),
+            slug,
             name,
             variants: variants.map(variant => ({
                 price: variant.price,
                 originalPrice: variant.originalPrice,
+                sku:variant.sku,
                 isPrimary: variant.isPrimary,
-                sku: variant.sku,
+                attributes:variant.attributes,
+                stock:variant.stock,
             })),
             minPrice,
             maxPrice,
@@ -130,6 +150,7 @@ function buildProductCards(productRecords: RawProductCard[], LIMIT: number): Pag
             reviews: reviewCount,
         }
     })
+    
     return {
         data: productCards,
         paginationState: {

@@ -8,6 +8,7 @@ import { useCallback, useState } from "react";
 import Link from "next/link";
 import { CartDrawer } from "./CartDrawer";
 import { useAppSelector } from "../store/hooks";
+import { Logo } from "./Logo";
 
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -45,17 +46,6 @@ export function Navbar() {
         <CartDrawer isCartOpen={isCartOpen} handleCartOpenChange={handleCartOpenChange}/>
       </nav>
     </>
-  );
-}
-
-function Logo() {
-  return (
-    <div className="flex items-center gap-1.5">
-      <div className="bg-inverse text-text-100 px-2  rounded-lg text-h4 md:text-h3">
-        S
-      </div>
-      <h2 className="text-h5 md:text-h3">Shoporia</h2>
-    </div>
   );
 }
 

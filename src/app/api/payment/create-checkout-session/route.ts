@@ -32,8 +32,6 @@ export async function POST(req: NextRequest): Promise<NextResponse<CreateCheckou
         const baseUrl =await getBaseUrl();
 
         const redirectUrl = `${baseUrl}${pathName??""}`
-        console.log(redirectUrl);
-        
         const { price } = selectedVariant;
 
         const session = await stripe.checkout.sessions.create({

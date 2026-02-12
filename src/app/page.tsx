@@ -3,7 +3,6 @@ import { FeaturedProducts } from "./Components/FeaturedProducts/FeaturedProducts
 import { Footer } from "./Components/Footer";
 import { HeroSection } from "./Components/HeroSection";
 import { Navbar } from "./Components/Navbar/Navbar";
-import { PopupModal } from "./Components/PopupModal";
 import { homeCarouselSlides } from "./Constants/home-carousel";
 
 export default function Page() {
@@ -14,7 +13,6 @@ export default function Page() {
         <HeroSection slideData={homeCarouselSlides} />
         <CategorySection />
         <FeaturedProducts />
-        <PopupModal />
       </main>
       <Footer />
     </>

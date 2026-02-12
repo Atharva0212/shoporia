@@ -4,6 +4,7 @@ import { Layout } from "../Components/Layout";
 import { Divider } from "./Component/Divider";
 import { EmailInputStep } from "./Component/EmailInputStep";
 import { LoginHeader } from "./Component/LoginHeader";
+import { OAuthLogin } from "./Component/OAuthLogin";
 import { OTPEntryStep } from "./Component/OTPInputStep";
 import { useLoginContext } from "./Context/LoginContext/LoginContext";
 import { LoginContextProvider } from "./Context/LoginContext/LoginContextProvider";
@@ -41,7 +42,15 @@ function LoginFormSection() {
     <>
       <LoginHeader />
       <Form />
-      {verificationStatus === "pending" && <Divider />}
+      {verificationStatus === "pending" && (
+        <>
+        <Divider />
+        <OAuthLogin/>
+        </>
+      )}
     </>
   );
 }
+
+
+

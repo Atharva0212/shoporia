@@ -3,6 +3,7 @@ import { HomeCarouselSlide } from "../Types/HomeCarouselSlide.type";
 import { Carousel } from "./Carousel/Carousel";
 import { Button } from "./Button";
 import { Layout } from "./Layout";
+import Link from "next/link";
 
 type HeroSectionProps={
   slideData:HomeCarouselSlide[],
@@ -30,27 +31,28 @@ function CarouselSlide({
   index: number;
 }) {
   const isSlideEven=index % 2 === 0;
+  const {bg,heading,description,destination,ctaText,image}=slide;
   return (
     <div
       className={`w-full h-full flex ${
         isSlideEven ? "flex-row" : "flex-row-reverse"
       }`}
-      style={{ backgroundColor: slide.bg }}
+      style={{ backgroundColor: bg }}
     >
       {/* Text Column */}
       <div className="flex-1 flex flex-col items-start justify-center">
-          <h3 className="text-h4 font-bold mb-1 sm:mb-2">{slide.heading}</h3>
-          <p className="text-body mb-2 sm:mb-4">{slide.description}</p>
-          <Button className="bg-inverse text-text-100">
-            {slide.ctaText}
-          </Button>
+          <h3 className="text-h4 font-bold mb-2">{heading}</h3>
+          <p className="hidden sm:block text-body mb-2 sm:mb-4">{description}</p>
+          <Link href={destination} className="py-2 px-4 text-body bg-inverse text-text-100">
+            {ctaText}
+          </Link>
       </div>
 
       {/* Image Column */}
       <div className="flex-1 flex items-center justify-center w-full h-full">
           <Image
-            src={slide.image.url}
-            alt={slide.image.alt}
+            src={image.url}
+            alt={image.alt}
             width={400}
             height={400}
             className="w-full h-full object-contain"

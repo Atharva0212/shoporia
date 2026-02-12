@@ -1,8 +1,8 @@
 import { DataApiResponse } from "@/src/Types/response";
-import { NextRequest, NextResponse } from "next/server";
-import crypto from "crypto";
-import { OAUTH_PKCE_VERIFIER_COOKIE, OAUTH_STATE_COOKIE } from "../../Constants/auth";
 import { CookieOptions, setCookie } from "@/src/utils/cookies";
+import crypto from "crypto";
+import { NextResponse } from "next/server";
+import { OAUTH_PKCE_VERIFIER_COOKIE, OAUTH_STATE_COOKIE } from "../../Constants/auth";
 
 export function generateCodeVerifier() {
     return crypto.randomBytes(32).toString("base64url");
@@ -15,7 +15,9 @@ export function generateCodeChallenge(verifier: string) {
         .digest("base64url");
 }
 
-export async function GET(): Promise<NextResponse<DataApiResponse<{ url: string }>>> {
+export type GoogleLoginResponse =DataApiResponse<{ url: string }>;
+
+export async function GET(): Promise<NextResponse<GoogleLoginResponse>> {
     try {
         const pkceCodeVerifier = generateCodeVerifier();
         const pkceCodeChallenge = generateCodeChallenge(pkceCodeVerifier);

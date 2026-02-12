@@ -7,4 +7,5 @@ export type HomeCarouselSlide = {
   heading?: string;
   description?: string;
   ctaText?: string;
+  destination:string;
 };

@@ -9,14 +9,32 @@ export const productListingApi = createApi({
         baseUrl: "/api",
     }),
     endpoints: (builder) => ({
-        getProducts: builder.query<ProductListingState, ProductListingQueryParams, DataApiResponse<PaginatedProductCards>>({
+        getProducts: builder.query<ProductListingState, ProductListingQueryParams,DataApiResponse<PaginatedProductCards>>({
             query: (params) => {
-                
                 return {
                     url: "/products",
                     params,
                 }
             },
+            // merge(currentCacheData, responseData) {
+            //     const { products: existingProducts, filterCache: currentFilterCache } = currentCacheData ?? {
+            //         existingProducts: [],
+            //         currentFilterCache: {}
+            //     };
+            //     const { products, filterCache: incomingFilterCache } = responseData;
+            //     const mergedProducts = [...getUniqueProducts({
+            //         existingProducts,
+            //         newProducts: products,
+            //     })];
+            //     const updatedFilterCache = {
+            //         ...currentFilterCache,
+            //         ...incomingFilterCache,
+            //     };
+            //     return {
+            //         products: mergedProducts,
+            //         filterCache: updatedFilterCache,
+            //     }
+            // },
 
             transformResponse(baseQueryReturnValue, _, args) {
                 if (!baseQueryReturnValue.success) {
@@ -30,6 +48,27 @@ export const productListingApi = createApi({
                     filterCache: { [cacheKey]: paginationState },
                 }
             },
+//             async onQueryStarted(args, { dispatch, queryFulfilled,getState }) {
+//   try {
+//     const { data } = await queryFulfilled;
+//     const state=getState() as RootState;
+//     const {filters}=state.productListFilters;
+    
+//     const {products,filterCache:incomingFilterCache}=data;
+//                     dispatch(productListingApi.util.updateQueryData("getProducts", filters, (draft) => {
+    
+//                         draft.products = [...getUniqueProducts({
+//                             existingProducts: draft.products ?? [],
+//                             newProducts: products,
+//                         })];
+//                         draft.filterCache = {
+//                             ...draft.filterCache,
+//                             ...incomingFilterCache,
+//                         };
+//                     }));
+//   } catch {}
+// }
+
         }),
     })
 })

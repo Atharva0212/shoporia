@@ -94,10 +94,7 @@ async function fetchProductCards({ cursor, category, priceRange, query }: { curs
             }
         }
     ]);
-    console.log(productRecords.map(p=>p.variants)
-    );
     
-
     return buildProductCards(productRecords, LIMIT);
 }
 

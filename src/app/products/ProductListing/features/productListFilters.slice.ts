@@ -2,14 +2,14 @@ import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type { ProductListingQueryParams } from "../types";
 
 type ProductListFiltersState = {
-  filters: ProductListingQueryParams;
-  initialized: boolean; 
+    filters: ProductListingQueryParams;
+    initialized: boolean;
 };
 
 
 export const initialFilterState: ProductListFiltersState = {
-    initialized:false,
-    filters:{}
+    initialized: false,
+    filters: {}
 }
 
 const productListFilters = createSlice({
@@ -20,14 +20,12 @@ const productListFilters = createSlice({
             state,
             action: PayloadAction<ProductListingQueryParams>
         ) {
-            state = {
-                initialized:true,
-                filters:action.payload,
-            }
+            state.initialized = true;
+            state.filters = action.payload;
         },
     }
 })
 
 export const { updateProductFilters } = productListFilters.actions;
 
-export const { reducer:productListFiltersReducer,reducerPath:productListFiltersPath } = productListFilters;
+export const { reducer: productListFiltersReducer, reducerPath: productListFiltersPath } = productListFilters;

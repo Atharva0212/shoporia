@@ -3,14 +3,14 @@
 import { updateQueryParams } from "@/src/utils/queryParams";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { CategoryItem } from "../../Constants/categories";
 import {
   addToCart,
   CartItem,
   removeProductFromCart,
 } from "../../features/cart/cartSlice";
-import { useAppDispatch } from "../../store/hooks";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { FiltersLayout } from "./Components/filters/FiltersLayout";
 import { FiltersProvider } from "./Components/filters/ProductFiltersProvider";
 import { ProductCardItem } from "./Components/ProductCardItem";
@@ -20,7 +20,10 @@ import { ProductCardSkeleton } from "./Components/ui/Skeleton/ProductCardSkeleto
 import { ProductListingPageSkeleton } from "./Components/ui/Skeleton/ProductListingPageSkeleton";
 import { MAX_PRICE, MIN_PRICE } from "./constants/price";
 import { sortOptions } from "./constants/sortOptions";
-import { useGetProductsQuery } from "./features/productListingApi";
+import {
+  productListingApi,
+  useGetProductsQuery,
+} from "./features/productListingApi";
 import { useCategoryFilterOptions } from "./hooks/useCategoryFilterOptions";
 import { useFetchProducts } from "./hooks/useFetchProducts";
 import { useProductListingFilters } from "./hooks/useProductListingFilters";
@@ -36,6 +39,7 @@ import {
   filterProducts,
   shouldFetchMoreProducts,
 } from "./utils/productFilters";
+import { consumeListingNavTrigger } from "./utils/listingNavigationContext";
 
 function canLoadMoreProducts({
   categories,
@@ -85,8 +89,8 @@ function mapProductToCartItem(
   product: ProductCard,
   selectedVariant: ProductCard["variants"][number],
 ): CartItem {
-  const { productId,slug, name, image } = product;
-  const { attributes, price, originalPrice,sku, stock } = selectedVariant;
+  const { productId, slug, name, image } = product;
+  const { attributes, price, originalPrice, sku, stock } = selectedVariant;
   return {
     productId,
     slug,
@@ -138,6 +142,8 @@ export function ProductListingContent({
     filterCache: {},
   };
 
+  const shouldFetch = useRef(true);
+
   const router = useRouter();
 
   const dispatch = useAppDispatch();
@@ -161,6 +167,7 @@ export function ProductListingContent({
   const toggleFiltersDrawer = useCallback(() => {
     setIsFiltersDrawerOpen((prev) => !prev);
   }, []);
+
   const closeFiltersDrawer = useCallback(() => {
     setIsFiltersDrawerOpen(false);
   }, []);
@@ -203,7 +210,6 @@ export function ProductListingContent({
           id,
         };
       }
-
       fetchProducts({ params, baseQueryParams, updateShowLoadMore });
     },
     [
@@ -296,6 +302,43 @@ export function ProductListingContent({
     selectedRatings,
     sortBy,
   ]);
+  
+  console.log("hi");
+  useEffect(
+    function () {
+      if (isLoading) return;
+      
+      if (!shouldFetch.current) return;
+      
+      const listingNavTrigger = consumeListingNavTrigger();
+      
+      if (!listingNavTrigger) {
+        shouldFetch.current = false;
+        return;
+      }
+      
+      if (productListItems.length !== 0) {
+        shouldFetch.current = false;
+        return;
+      }
+      console.log("hi2");
+
+      loadProducts({
+        categories: selectedCategories,
+        maxPrice: priceRange.maxPrice,
+        query: searchQuery,
+      });
+      shouldFetch.current = false;
+    },
+    [
+      isLoading,
+      productListItems,
+      loadProducts,
+      selectedCategories,
+      priceRange,
+      searchQuery,
+    ],
+  );
 
   const handleProductClick = useCallback(
     function (slug: ProductCard["slug"], scrollY: number) {
@@ -333,10 +376,6 @@ export function ProductListingContent({
     dispatch(addToCart({ product: cartItem }));
   }
 
-  if (isLoading) {
-    return <ProductListingPageSkeleton />;
-  }
-
   const activeFiltersCount = selectedCategories.length + selectedRatings.length;
 
   function isValidSortOption(value: string): value is SortOption {
@@ -349,6 +388,10 @@ export function ProductListingContent({
       return;
     }
     applySort(selectedSort);
+  }
+
+  if (isLoading) {
+    return <ProductListingPageSkeleton />;
   }
 
   return (
@@ -401,43 +444,47 @@ export function ProductListingContent({
                 />
               ))}
             </main>
-                   {!isError && productListItems.length === 0 && (
-                <div className="text-center py-16">
-                  <div className="text-text-500 mb-4">
-                    <Image
-                      src={"/icons/search-xl.svg"}
-                      alt=""
-                      width={64}
-                      height={64}
-                      className="w-16 h-16 mx-auto"
-                    />
-                  </div>
-                  <h3 className="text-h6 font-semibold text-text-900 mb-2">
-                    No products found
-                  </h3>
-                  <p className="text-body text-text-500 mb-6">
-                    Try adjusting your filters or search terms
-                  </p>
-                  <button
-                    onClick={()=>{
-                      clearAllFilters();
-                      if(!products||products.length===0){
-                        loadProducts({categories:[],maxPrice:MAX_PRICE,query:""});
-                      }
-                    }}
-                    className="px-6 py-3 text-body bg-inverse text-white rounded-full font-medium hover:bg-gray-800 transition"
-                  >
-                    Clear All Filters
-                  </button>
+            {!isError && productListItems.length === 0 && (
+              <div className="text-center py-16">
+                <div className="text-text-500 mb-4">
+                  <Image
+                    src={"/icons/search-xl.svg"}
+                    alt=""
+                    width={64}
+                    height={64}
+                    className="w-16 h-16 mx-auto"
+                  />
                 </div>
-              )}
-              {(isRefreshing || isFetching) && (
-                <>
-                  {Array.from({ length: 4 }).map((_, index) => (
-                    <ProductCardSkeleton key={index} />
-                  ))}
-                </>
-              )}
+                <h3 className="text-h6 font-semibold text-text-900 mb-2">
+                  No products found
+                </h3>
+                <p className="text-body text-text-500 mb-6">
+                  Try adjusting your filters or search terms
+                </p>
+                <button
+                  onClick={() => {
+                    clearAllFilters();
+                    if (!products || products.length === 0) {
+                      loadProducts({
+                        categories: [],
+                        maxPrice: MAX_PRICE,
+                        query: "",
+                      });
+                    }
+                  }}
+                  className="px-6 py-3 text-body bg-inverse text-white rounded-full font-medium hover:bg-gray-800 transition"
+                >
+                  Clear All Filters
+                </button>
+              </div>
+            )}
+            {(isRefreshing || isFetching) && (
+              <>
+                {Array.from({ length: 4 }).map((_, index) => (
+                  <ProductCardSkeleton key={index} />
+                ))}
+              </>
+            )}
             {!isError && !isFetching && showLoadMore && (
               <div className="flex justify-center mt-12">
                 <button

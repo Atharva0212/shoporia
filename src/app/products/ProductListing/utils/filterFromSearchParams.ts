@@ -5,7 +5,7 @@ import { FilterMap } from "./navigationState";
 export function getInitialFilterStateFromSearchParams(searchParams: URLSearchParams): FilterMap {
   return {
     selectedCategories: (() => {
-      const rawCategoriesParam = searchParams.get(FILTER_QUERY_PARAMS.CATEGORY);
+      const rawCategoriesParam = searchParams.get(FILTER_QUERY_PARAMS.CATEGORY);      
       if (!rawCategoriesParam) return [];
       const parsedCategories = rawCategoriesParam.split(",");
       return parseSelectedCategories(parsedCategories)

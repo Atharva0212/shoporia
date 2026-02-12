@@ -21,7 +21,3 @@ export function clearQueryParams() {
     const url = window.location.origin + window.location.pathname;
     window.history.replaceState(null, '', url);
 }
-
-export function getSearchParams() {
-  return new URLSearchParams(window.location.search);
-}

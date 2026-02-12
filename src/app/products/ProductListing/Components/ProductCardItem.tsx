@@ -69,7 +69,7 @@ export function ProductCardItem({
             height={200}
             src={product.image}
             alt={product.name}
-            className="h-full w-full object-cover aspect-square rounded-2xl"
+            className="h-full w-full object-cover aspect-square rounded-2xl bg-skeleton"
           />
         </div>
 

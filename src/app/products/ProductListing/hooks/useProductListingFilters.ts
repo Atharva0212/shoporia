@@ -1,26 +1,29 @@
 import { CategoryItem } from "@/src/app/Constants/categories";
 import { useAppDispatch, useAppSelector } from "@/src/app/store/hooks";
-import { clearQueryParams, getSearchParams, updateQueryParams } from "@/src/utils/queryParams";
+import { useDebounce } from "@/src/hooks/useDebounce";
+import { clearQueryParams, updateQueryParams } from "@/src/utils/queryParams";
+import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { MAX_PRICE, MIN_PRICE } from "../constants/price";
 import { updateProductFilters } from "../features/productListFilters.slice";
 import type { PriceRange, ProductListingQueryParams, SortOption } from "../types";
 import { buildFilterQueryParams, FILTER_QUERY_PARAMS } from "../utils/filterQueryParams";
 import { getSearchNavigationState } from "../utils/searchNavigationState";
-import { useDebounce } from "./useDebounce";
 
 export function useProductListingFilters({ updatedAtCursor }: { updatedAtCursor: number }) {
   const productListFilters = useAppSelector(state => state.productListFilters)
+  const searchParams=useSearchParams();
   const dispatch = useAppDispatch();
 
   const [initialResultsState] = useState(() => {
-    const searchParams = getSearchParams();
     return getSearchNavigationState(searchParams);
   });
 
   useEffect(() => {
     const { isReturningToResults,filters } = initialResultsState;
-    updateQueryParams({ queryParams: buildFilterQueryParams(filters) });
+    if(isReturningToResults){
+      updateQueryParams({ queryParams: buildFilterQueryParams(filters) });
+    }
     if (!isReturningToResults) return
     const { scrollY } = initialResultsState;
     window.scrollTo({ top: scrollY, behavior: "auto" });

@@ -1,6 +1,6 @@
 import { CategoryItem } from "@/src/app/Constants/categories";
 import type { SortOption } from "../types";
-import { getSessionItem, removeSessionItem, setSessionItem } from "./sessionStorage";
+import { getSessionItem, removeSessionItem, setSessionItem } from "../../../../utils/sessionStorage";
 
 const PRODUCTS_NAVIGATION_KEY = "products:navigation";
 

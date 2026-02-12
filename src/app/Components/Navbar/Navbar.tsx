@@ -1,21 +1,22 @@
 "use client";
 
 import Image from "next/image";
-import { twMerge } from "tailwind-merge";
-import { Button } from "./Button";
-import { Layout } from "./Layout";
-import { useCallback, useState } from "react";
 import Link from "next/link";
-import { CartDrawer } from "./CartDrawer";
-import { useAppSelector } from "../store/hooks";
-import { Logo } from "./Logo";
+import { useCallback, useState } from "react";
+import { useAppSelector } from "../../store/hooks";
+import { Button } from "../Button";
+import { CartDrawer } from "../CartDrawer";
+import { Layout } from "../Layout";
+import { Logo } from "../Logo";
+import { SearchInput } from "./Components/SearchInput";
+import { ProfileAvatar } from "./Components/ProfileAvatar";
 
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
-    const handleCartOpenChange = useCallback(function (isOpen: boolean) {
+  const handleCartOpenChange = useCallback(function (isOpen: boolean) {
     setIsCartOpen(isOpen);
-  },[]);
+  }, []);
   return (
     <>
       <nav>
@@ -26,7 +27,7 @@ export function Navbar() {
           >
             <Logo />
             <SearchInput className="hidden sm:block flex-1" />
-            <NavbarActions handleCartOpenChange={handleCartOpenChange}/>
+            <NavbarActions handleCartOpenChange={handleCartOpenChange} />
             <HamburgerMenu
               isMenuOpen={isMenuOpen}
               onMenuToogle={() => setIsMenuOpen((prev) => !prev)}
@@ -40,46 +41,48 @@ export function Navbar() {
         >
           <Layout className="py-4">
             <SearchInput className="mx-auto mb-4" />
-            <NavbarMenuActions handleCartOpenChange={handleCartOpenChange}/>
+            <NavbarMenuActions handleCartOpenChange={handleCartOpenChange} />
           </Layout>
         </div>
-        <CartDrawer isCartOpen={isCartOpen} handleCartOpenChange={handleCartOpenChange}/>
+        <CartDrawer
+          isCartOpen={isCartOpen}
+          handleCartOpenChange={handleCartOpenChange}
+        />
       </nav>
     </>
   );
 }
 
-function SearchInput({ className }: { className?: string }) {
-  return (
-    <div className={twMerge("relative max-w-xl w-full", className)}>
-      <input
-        type="text"
-        placeholder="Search products, categories..."
-        // value={searchQuery}
-        // onChange={(e) => setSearchQuery(e.target.value)}
-        className="w-full pl-12 pr-4 py-2 text-text-500 border border-divider-300 rounded-full focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent text-body"
-      />
-      <div className="w-5 h-5 text-gray-400 absolute left-4 top-2.5">
-        <Image src={"/icons/search.svg"} alt="Search" width={20} height={20} />
-      </div>
-    </div>
-  );
-}
+function NavbarActions({
+  handleCartOpenChange,
+}: {
+  handleCartOpenChange: (isCartOpen: boolean) => void;
+}) {
+  const { isLoggedIn, avatarBg, name } = useAppSelector((state) => state.user);
 
-function NavbarActions({handleCartOpenChange}:{handleCartOpenChange:(isCartOpen: boolean)=>void}) {
-  const cartCount=useAppSelector(state=>state.cart).items.length;
+  const loginStatus = !!(isLoggedIn && avatarBg && name);
+
+  const cartCount = useAppSelector((state) => state.cart).items.length;
   return (
-    <div className="hidden sm:flex items-center gap-4">
-      <Button data-count={cartCount} onClick={()=>handleCartOpenChange(true)} className={`relative px-2 rounded-full before:content-[attr(data-count)] before:absolute before:-right-2 before:-top-2 before:bg-white before:outline-1 before:outline-black before:rounded-full before:font-body before:font-medium before:text-text-900 before:px-2 text-[12px]`}>
+    <div className="hidden sm:flex items-center gap-8">
+      <Button
+        data-count={cartCount}
+        onClick={() => handleCartOpenChange(true)}
+        className={`relative px-2 rounded-full before:content-[attr(data-count)] before:absolute before:-right-2 before:-top-2 before:bg-white before:outline-1 before:outline-black before:rounded-full before:font-body before:font-medium before:text-text-900 before:px-2 text-[12px]`}
+      >
         <Image
           src={"/icons/shopping-cart.svg"}
           alt="shopping-cart"
-          height={20}
-          width={20}
+          height={26}
+          width={26}
           className="w-[26px] h-[26px]"
         />
       </Button>
-      <LoginButton />
+      {loginStatus ? (
+        <ProfileAvatar avatarBg={avatarBg} initial={name[0]} />
+      ) : (
+        <LoginButton />
+      )}
     </div>
   );
 }
@@ -102,12 +105,27 @@ function LoginButton() {
   );
 }
 
-function NavbarMenuActions({handleCartOpenChange}:{handleCartOpenChange:(isCartOpen: boolean)=>void}) {
-  const cartCount=useAppSelector(state=>state.cart).items.length;
+function NavbarMenuActions({
+  handleCartOpenChange,
+}: {
+  handleCartOpenChange: (isCartOpen: boolean) => void;
+}) {
+  const { isLoggedIn, avatarBg, name } = useAppSelector((state) => state.user);
+
+  const loginStatus = !!(isLoggedIn && avatarBg && name);
+
+  const cartCount = useAppSelector((state) => state.cart).items.length;
   return (
     <div className="grid grid-cols-2 items-center gap-4">
-      <LoginButton />
-      <Button onClick={()=>handleCartOpenChange(true)} className="flex items-center justify-center border border-divider-400 gap-1 rounded-2xl">
+      {loginStatus ? (
+        <ProfileAvatar avatarBg={avatarBg} initial={name[0]} />
+      ) : (
+        <LoginButton />
+      )}
+      <Button
+        onClick={() => handleCartOpenChange(true)}
+        className="flex items-center justify-center border border-divider-400 gap-1 rounded-2xl"
+      >
         <Image
           src={"/icons/shopping-cart.svg"}
           alt="shopping-cart"

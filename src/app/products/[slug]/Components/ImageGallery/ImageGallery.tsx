@@ -25,7 +25,7 @@ export function ImageGallery({ productName,productImages }: ImageGalleryProps) {
       <div className="aspect-square overflow-hidden rounded-2xl mb-4">
         <Image
           src={activeImage["url"]}
-          className="w-full min-h-full object-cover rounded-2xl"
+          className="w-full min-h-full object-cover rounded-2xl bg-skeleton"
           alt={productName}
           width={450} height={450}
         />
@@ -41,7 +41,7 @@ export function ImageGallery({ productName,productImages }: ImageGalleryProps) {
                 id === activeImage.id ? "outline-1 outline-black" : ""
               }`}
             >
-              <Image className="w-full h-full object-cover" src={url} alt={productName} width={200} height={200}/>
+              <Image className="w-full h-full object-cover bg-skeleton" src={url} alt={productName} width={200} height={200}/>
             </div>
           );
         })}

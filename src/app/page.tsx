@@ -1,7 +1,7 @@
 import { CategorySection } from "./Components/CategorySection";
-import { FeaturedProducts } from "./Components/FeaturedProducts";
+import { FeaturedProducts } from "./Components/FeaturedProducts/FeaturedProducts";
 import { HeroSection } from "./Components/HeroSection";
-import { Navbar } from "./Components/Navbar";
+import { Navbar } from "./Components/Navbar/Navbar";
 import { PopupModal } from "./Components/PopupModal";
 import { homeCarouselSlides } from "./Constants/home-carousel";
 

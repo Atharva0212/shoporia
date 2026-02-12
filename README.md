@@ -1,36 +1,166 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🛍️ Shoporia — Full-Stack E-Commerce Platform
 
-## Getting Started
+Shoporia is a full-stack, production-style e-commerce platform built with modern web technologies. It features custom authentication, product variants, reviews, Stripe payments, and scalable state management.
 
-First, run the development server:
+This project demonstrates real-world full-stack engineering across frontend, backend, database design, and third-party service integrations.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 🌐 Live Demo
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+🔗 [https://shoporia-6qbp.vercel.app/](https://shoporia-6qbp.vercel.app/)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🚀 Features
 
-## Learn More
+### 🔐 Authentication
 
-To learn more about Next.js, take a look at the following resources:
+* Email OTP-based authentication
+* Google OAuth login
+* JWT-based session management (Jose)
+* Secure user onboarding with pending user workflow
+* Profile completion flow
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 🛒 E-Commerce Core
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+* Product catalog with categories & subcategories
+* Advanced product variants (multiple prices/options)
+* Multiple product images
+* Product search & discovery
+* Pagination for product listings
+* Featured products section
 
-## Deploy on Vercel
+### ⭐ Reviews & Ratings
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+* Star rating system (0–5)
+* Product reviews with nested replies
+* Rating aggregation & distribution
+* Review count tracking
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### 🛍 Shopping Experience
+
+* Shopping cart with Redux Toolkit
+* Persistent cart state
+* Cart drawer UI
+* Real-time cart updates
+
+### 💳 Payments
+
+* Stripe payment gateway integration
+* Secure checkout session creation
+* Server-side payment handling
+
+### 🎨 UI/UX System
+
+* Custom modal system with animations
+* Toast notification system
+* Hero carousel for promotions
+* Responsive navbar with search
+* Reusable component library
+* Fully responsive design
+
+---
+
+## 🧱 Tech Stack
+
+### Frontend
+
+* **Next.js 16** (App Router, SSR/SSG)
+* **React 19**
+* **TypeScript 5.9**
+* **Tailwind CSS 4**
+* **Redux Toolkit** (global state)
+* **Axios** (API communication)
+
+### Backend
+
+* **Next.js API Routes**
+* **MongoDB + Mongoose**
+* **Stripe** (payments)
+* **Mailjet** (OTP & email notifications)
+* **JWT (Jose)** for authentication
+
+### Tooling
+
+* ESLint v9
+* Strict TypeScript
+* PostCSS
+* Vercel deployment
+
+---
+
+## 🗄️ Database Models
+
+* **User** — email, name, avatar customization
+* **PendingUser** — OTP-based registration flow
+* **Product** — product info, ratings, reviews
+* **ProductVariant** — pricing & option variants
+* **ProductImage** — image metadata
+* **Review** — product reviews with nested replies
+
+---
+
+## 🏗 Architecture Highlights
+
+### State Management
+
+* Redux Toolkit for:
+
+  * Shopping cart
+  * User authentication state
+* React Context for:
+
+  * Modals
+  * Toast notifications
+* Custom hooks for reusable logic
+
+### Authentication Flow
+
+* Email OTP send/verify flow
+* Google OAuth integration
+* JWT token creation & verification using Jose
+* Protected API routes
+
+### Database & Connections
+
+* Mongoose connection pooling
+* Global cached DB connection
+* Efficient connection lifecycle handling
+
+### API Design
+
+* RESTful API endpoints
+* Type-safe request/response handling
+* Centralized error handling utilities
+* Auth-protected routes
+
+---
+
+## 🧪 Scalability & Best Practices
+
+* Type safety across frontend & backend
+* Modular component architecture
+* Separation of concerns (API, UI, utils)
+* Reusable UI component system
+* Optimized image handling with Next.js Image
+* SEO optimization using Next.js Metadata API
+
+---
+
+## 📌 Future Improvements
+
+* Stripe webhooks for payment status syncing
+* Admin dashboard for product & order management
+* Automated testing (Playwright/Jest)
+* Role-based access control (admin/user)
+* Inventory management
+* Order history & invoices
+
+---
+
+## 👨‍💻 Author
+
+**Atharva**
+Full-Stack Developer
+GitHub: [https://github.com/Atharva0212](https://github.com/Atharva0212)
+
+---

@@ -12,7 +12,7 @@ import { LoginApiResponse } from "../../api/auth/types";
 
 export function OTPInput({ length = 6 }: { length?: number }) {
   const [otpArray, setOtpArray] = useState<string[]>(
-    new Array(length).fill("")
+    new Array(length).fill(""),
   );
 
   const inputRef = useRef<HTMLInputElement[]>([]);
@@ -20,8 +20,8 @@ export function OTPInput({ length = 6 }: { length?: number }) {
   const { addToast } = useToast();
   const { setModal } = useModal();
 
-  const dispatch=useAppDispatch();
-  const router=useRouter();
+  const dispatch = useAppDispatch();
+  const router = useRouter();
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>, index: number) {
     const val = e.currentTarget.value.slice(-1);
@@ -39,7 +39,7 @@ export function OTPInput({ length = 6 }: { length?: number }) {
 
   function handleKeyDown(
     e: React.KeyboardEvent<HTMLInputElement>,
-    index: number
+    index: number,
   ) {
     if (e.key === "Escape" || e.key === "Backspace") {
       //   e.preventDefault(); // prevent any default behavior
@@ -66,7 +66,7 @@ export function OTPInput({ length = 6 }: { length?: number }) {
 
   function handlePaste(
     e: React.ClipboardEvent<HTMLInputElement>,
-    index: number
+    index: number,
   ) {
     e.preventDefault();
     const pastedText = e.clipboardData.getData("text/plain");
@@ -97,18 +97,26 @@ export function OTPInput({ length = 6 }: { length?: number }) {
     try {
       const response = await axios.post<LoginApiResponse>(
         "/api/auth/verify-otp",
-        { otp: otpArray.join("")}
+        { otp: otpArray.join("") },
       );
       const { data } = response;
-      if(data.success){
-        console.log(data);
-        
-        const {userId,userName,avatarBg}=data.userState;
-        dispatch(updateLoginStatus({isLoggedIn:true,userId,name:userName,avatarBg}));
+      if (data.success) {
+        const { userId, userName, avatarBg } = data.userState;
+        dispatch(
+          updateLoginStatus({
+            isLoggedIn: true,
+            userId,
+            name: userName,
+            avatarBg,
+          }),
+        );
         router.back();
       }
     } catch (error: unknown) {
-      const errorMessage = getErrorMessage(error, "Failed to verify OTP. Please try again.");
+      const errorMessage = getErrorMessage(
+        error,
+        "Failed to verify OTP. Please try again.",
+      );
       setModal(errorMessage, "error");
     }
   }

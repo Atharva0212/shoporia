@@ -39,8 +39,6 @@ export async function POST(req: NextRequest): Promise<NextResponse<LoginApiRespo
                 { status: 404 }
             );
         }
-        console.log(pendingUserRecord.otp);
-        console.log(otp);
 
         if (pendingUserRecord.otp !== otp) {
             return NextResponse.json(

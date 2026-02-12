@@ -1,8 +1,5 @@
-import { FeaturedProductCardData } from "./type";
 import { Layout } from "../Layout";
-import { FeaturedProductCard } from "./FeaturedProductCard";
 import { SectionHeading } from "../SectionHeading";
-import { featuredProducts } from "./Constants/featuredProducts";
 import { FeaturedProductsList } from "./FeaturedProductsList";
 
 export function FeaturedProducts() {

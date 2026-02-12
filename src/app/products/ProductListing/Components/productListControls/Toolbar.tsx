@@ -43,7 +43,7 @@ function ProductFiltersButton() {
   return (
     <button
       onClick={toggleFiltersDrawer}
-      className="flex min-w-24 items-center justify-center gap-1.5 py-2 border border-gray-300 rounded-full hover:bg-gray-50 text-body-sm font-medium"
+      className="flex min-w-24 px-2 items-center justify-center gap-1.5 py-2 border border-gray-300 rounded-full hover:bg-gray-50 text-body-sm font-medium"
     >
       <Image src={"/icons/sliders-horizontal.svg"} alt="" width={16} height={16} className="w-4 h-4" />
       <span>Filters</span>

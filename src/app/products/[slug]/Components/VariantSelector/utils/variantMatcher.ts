@@ -1,4 +1,4 @@
-import { Attributes } from "../../../types";
+import { Attributes } from "@/src/Types/types";
 
 function findMatchingVariant(variants: Attributes[], candidateAttribute: Attributes) {
     const [attributeKey, attributeValue] = Object.entries(candidateAttribute)[0];

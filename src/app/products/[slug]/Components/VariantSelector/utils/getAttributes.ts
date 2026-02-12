@@ -1,6 +1,6 @@
-import { Varient } from "../../../types";
+import { VariantRecordData } from "@/src/lib/db/models/products/ProductVariant.model";
 
-export function getAttributes(variantList: Varient[]) {
+export function getAttributes(variantList: VariantRecordData[]) {
     const attributes: Record<string, Set<string | number>> = {};
 
   variantList.forEach((variant) => {

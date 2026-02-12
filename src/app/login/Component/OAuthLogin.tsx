@@ -10,9 +10,7 @@ export function OAuthLogin(){
 function GoogleLoginButton(){
   async function handleGoogleLogin(){
     const {data}=await axios<GoogleLoginResponse>("/api/auth/google/login");
-    if(data.success){
-      console.log(data.responseData.url);
-      
+    if(data.success){      
       window.location.href=data.responseData.url;
       return;
     }

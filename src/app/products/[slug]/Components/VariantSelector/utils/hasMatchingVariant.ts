@@ -1,4 +1,4 @@
-import { Attributes } from "../../../types";
+import { Attributes } from "@/src/Types/types";
 import type { getVariantFilterOptions } from "./getVariantFilterOptions";
 
 export function hasMatchingVariant(variant: ReturnType<typeof getVariantFilterOptions>, filterable: Attributes) {

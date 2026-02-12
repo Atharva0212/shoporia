@@ -60,8 +60,6 @@ function NavbarActions({
 }) {
   const { isLoggedIn, avatarBg, name } = useAppSelector((state) => state.user);
 
-  const loginStatus = !!(isLoggedIn && avatarBg && name);
-
   const cartCount = useAppSelector((state) => state.cart).items.length;
   return (
     <div className="hidden sm:flex items-center gap-8">
@@ -78,8 +76,8 @@ function NavbarActions({
           className="w-[26px] h-[26px]"
         />
       </Button>
-      {loginStatus ? (
-        <ProfileAvatar avatarBg={avatarBg} initial={name[0]} />
+      {isLoggedIn ? (
+        <ProfileAvatar avatarBg={avatarBg} initial={name&&name[0]} />
       ) : (
         <LoginButton />
       )}
@@ -110,15 +108,13 @@ function NavbarMenuActions({
 }: {
   handleCartOpenChange: (isCartOpen: boolean) => void;
 }) {
-  const { isLoggedIn, avatarBg, name } = useAppSelector((state) => state.user);
-
-  const loginStatus = !!(isLoggedIn && avatarBg && name);
+  const { isLoggedIn, avatarBg, name } = useAppSelector((state) => state.user);  
 
   const cartCount = useAppSelector((state) => state.cart).items.length;
   return (
     <div className="grid grid-cols-2 items-center gap-4">
-      {loginStatus ? (
-        <ProfileAvatar avatarBg={avatarBg} initial={name[0]} />
+      {isLoggedIn ? (
+        <ProfileAvatar avatarBg={avatarBg} initial={name&&name[0]} />
       ) : (
         <LoginButton />
       )}

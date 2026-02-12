@@ -16,7 +16,7 @@ const userSlice = createSlice({
     initialState: initialUserState,
     reducers: {
         updateLoginStatus: (state, action: PayloadAction<UserState>) => {
-            state = action.payload;
+            return action.payload;
         },
         updateName: (state, action: PayloadAction<{ name: string }>) => {
             state.name = action.payload.name;

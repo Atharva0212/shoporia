@@ -1,4 +1,4 @@
-import { Attributes } from "../../../types";
+import { Attributes } from "@/src/Types/types";
 
 export function hasExactVariant(
     variants: Attributes[],

@@ -320,7 +320,6 @@ export function ProductListingContent({
         shouldFetch.current = false;
         return;
       }
-      console.log("hi2");
 
       loadProducts({
         categories: selectedCategories,

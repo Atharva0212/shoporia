@@ -9,11 +9,7 @@ export function ProfileAvatar({
   avatarBg: string|undefined;
 }){
   const {openCompleteProfileModal}=useCompleteProfileModal()
-  console.log(initial);
-  console.log(avatarBg);
-  if(!initial||!avatarBg){
-    console.log("hiii");
-    
+  if(!initial||!avatarBg){    
     return(
     <button 
     onClick={openCompleteProfileModal}

@@ -11,6 +11,8 @@ function GoogleLoginButton(){
   async function handleGoogleLogin(){
     const {data}=await axios<GoogleLoginResponse>("/api/auth/google/login");
     if(data.success){
+      console.log(data.responseData.url);
+      
       window.location.href=data.responseData.url;
       return;
     }

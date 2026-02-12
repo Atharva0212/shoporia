@@ -1,5 +1,6 @@
 import { CategorySection } from "./Components/CategorySection";
 import { FeaturedProducts } from "./Components/FeaturedProducts/FeaturedProducts";
+import { Footer } from "./Components/Footer";
 import { HeroSection } from "./Components/HeroSection";
 import { Navbar } from "./Components/Navbar/Navbar";
 import { PopupModal } from "./Components/PopupModal";
@@ -10,11 +11,12 @@ export default function Page() {
     <>
       <Navbar />
       <main className="min-h-screen">
-          <HeroSection slideData={homeCarouselSlides}/>
-          <CategorySection />
-          <FeaturedProducts/>
-          <PopupModal/>
+        <HeroSection slideData={homeCarouselSlides} />
+        <CategorySection />
+        <FeaturedProducts />
+        <PopupModal />
       </main>
+      <Footer />
     </>
   );
 }

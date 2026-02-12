@@ -104,7 +104,7 @@ export function ProductDetailsContent({ slug }: ProductDetailsContentProps) {
   }
 
   return (
-    <Layout className="max-w-5xl" isMain={true}>
+    <Layout className="max-w-5xl min-h-screen" isMain={true}>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-12 mb-12 z-10">
         <ImageGallery productName={name} productImages={images} />
         <div>

@@ -303,7 +303,6 @@ export function ProductListingContent({
     sortBy,
   ]);
   
-  console.log("hi");
   useEffect(
     function () {
       if (isLoading) return;
@@ -395,7 +394,7 @@ export function ProductListingContent({
   }
 
   return (
-    <div className="bg-surface">
+    <div className="bg-surface min-h-screen">
       {/* Header */}
       <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 ">

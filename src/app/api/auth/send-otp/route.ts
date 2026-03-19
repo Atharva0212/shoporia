@@ -33,12 +33,12 @@ export async function POST(req: NextRequest): Promise<NextResponse<ExtendedMessa
         }
         await setCookie(token, cookieOptions);
 
-        // const emailService = EmailService.getInstance();
-        // const { subject, html } = generateVerificationEmail(otp);
-        // const emailResponse = await emailService.sendEmail(email, subject, html);
-        // if (!emailResponse.success) {
-        //     return NextResponse.json<ExtendedMessageApiResponse>({ success: true, message: emailResponse.error }, { status: 500 });
-        // }
+        const emailService = EmailService.getInstance();
+        const { subject, html } = generateVerificationEmail(otp);
+        const emailResponse = await emailService.sendEmail(email, subject, html);
+        if (!emailResponse.success) {
+            return NextResponse.json<ExtendedMessageApiResponse>({ success: true, message: emailResponse.error }, { status: 500 });
+        }
         return NextResponse.json<ExtendedMessageApiResponse>({ success: true, message: "Otp sent successfully!" }, { status: 200 });
     } catch (error) {
         console.error("Error sending otp",error);
